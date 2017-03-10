@@ -9,5 +9,15 @@ public class MineCell {
     int numSurroundingMines;
     CellState cellState;
 
-    enum CellState { CLICKED, UNCLICKED, FLAGGED }
+    enum CellState { UNCLICKED, CLICKED, FLAGGED }
+
+    public MineCell(boolean isMine) {
+        this.isMine = isMine;
+        this.numSurroundingMines = -1;
+        this.cellState = CellState.UNCLICKED;
+    }
+
+    public boolean getIsMine() {
+        return this.isMine;
+    }
 }
