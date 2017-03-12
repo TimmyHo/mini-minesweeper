@@ -1,7 +1,10 @@
 package com.timmyho.miniminesweeper.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by timot on 3/10/2017.
@@ -17,21 +20,68 @@ public class MineGrid {
         this.numCols = cols;
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
 
+        // PROTO_ONLY only to ensure the mines work, this needs to be replaced by a way to
+        // randomly generate the mine field;
+        Random rand = new Random();
         for (int i = 0; i < this.numRows; i++) {
             ArrayList<MineCell> mineRow = new ArrayList<MineCell>();
             for (int j = 0; j < this.numCols; j++) {
-                // TEMP_TEST only to ensure the mines work, this needs to be replaced by a way to
-                // randomly generate the mine field;
-                boolean isMine = false;
-                if ((i+j) % 4 == 0) {
-                    isMine = true;
-                }
-                MineCell cell = new MineCell(isMine);
-
+                MineCell cell = new MineCell(rand.nextInt(10) == 0);
                 mineRow.add(cell);
             }
             this.mineGrid.add(mineRow);
         }
+
+        this.CalculateSurroundingMines();
+    }
+
+    private void CalculateSurroundingMines() {
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                this.mineGrid.get(i).get(j).setNumSurroundingMines(CalculateSurroundingMinesForMineCell(i, j));
+            }
+        }
+    }
+
+    private int CalculateSurroundingMinesForMineCell(int row, int col) {
+        int surroundingMines = 0;
+
+        // CODESMELL: feel this could be cleaner
+        if (row > 0) {
+            // TOP LEFT
+            if (col > 0) {
+                surroundingMines += this.mineGrid.get(row - 1).get(col - 1).getIsMine() ? 1 : 0;
+            }
+            // TOP RIGHT
+            if (col < this.numCols - 1) {
+                surroundingMines += this.mineGrid.get(row - 1).get(col + 1).getIsMine() ? 1 : 0;
+            }
+            // TOP MIDDLE
+            surroundingMines += this.mineGrid.get(row - 1).get(col).getIsMine() ? 1 : 0;
+        }
+
+        if (row < this.numRows - 1) {
+            // BOTTOM LEFT
+            if (col > 0) {
+                surroundingMines += this.mineGrid.get(row + 1).get(col - 1).getIsMine() ? 1 : 0;
+            }
+            // BOTTOM RIGHT
+            if (col < this.numCols - 1) {
+                surroundingMines += this.mineGrid.get(row + 1).get(col + 1).getIsMine() ? 1 : 0;
+            }
+            // BOTTOM MIDDLE
+            surroundingMines += this.mineGrid.get(row + 1).get(col).getIsMine() ? 1 : 0;
+        }
+
+        // MIDDLE LEFT
+        if (col > 0) {
+            surroundingMines += this.mineGrid.get(row).get(col - 1).getIsMine() ? 1 : 0;
+        }
+        if (col < this.numCols - 1) {
+            surroundingMines += this.mineGrid.get(row).get(col + 1).getIsMine() ? 1 : 0;
+        }
+
+        return surroundingMines;
     }
 
     // CODE_SMELL: could possibly override ToString?
@@ -41,13 +91,11 @@ public class MineGrid {
             for (int j = 0; j < this.numCols; j++) {
                 // CODE_SMELL: could be a place for an enum/string literal
                 String mineChar = "";
-                if (this.mineGrid.get(i).get(j).getIsMine() == true)
-                {
+                if (this.mineGrid.get(i).get(j).getIsMine() == true) {
                     mineChar = "M";
                 }
-                else
-                {
-                    mineChar = "O";
+                else {
+                    mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
                 }
                 gridAsString += mineChar+" ";
             }

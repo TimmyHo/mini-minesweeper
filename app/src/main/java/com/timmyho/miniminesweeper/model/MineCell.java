@@ -5,19 +5,27 @@ package com.timmyho.miniminesweeper.model;
  */
 
 public class MineCell {
-    boolean isMine;
-    int numSurroundingMines;
+    Boolean isMine;
+    Integer numSurroundingMines;
     CellState cellState;
 
     enum CellState { UNCLICKED, CLICKED, FLAGGED }
 
-    public MineCell(boolean isMine) {
+    public MineCell(Boolean isMine) {
         this.isMine = isMine;
         this.numSurroundingMines = -1;
         this.cellState = CellState.UNCLICKED;
     }
 
-    public boolean getIsMine() {
+    public Boolean getIsMine() {
         return this.isMine;
+    }
+
+    public void setNumSurroundingMines(Integer numSurroundingMines) {
+        this.numSurroundingMines = numSurroundingMines;
+    }
+
+    public Integer getNumSurroundingMines() {
+        return this.numSurroundingMines;
     }
 }
