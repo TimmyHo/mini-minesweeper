@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper.model;
 
+import android.graphics.Point;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -43,6 +44,11 @@ public class MineGrid {
             ArrayList<MineCell> mineRow = new ArrayList<MineCell>();
             for (int j = 0; j < this.numCols; j++) {
                 boolean addMine = rand.nextInt(10) == 0;
+                addMine = false;
+                if (i == 2 && j == 2)
+                {
+                    addMine = true;
+                }
                 MineCell cell = new MineCell(addMine);
                 numRandomMines += addMine ? 1: 0;
                 mineRow.add(cell);
@@ -73,7 +79,7 @@ public class MineGrid {
     private int CalculateSurroundingMinesForMineCell(int row, int col) {
         int surroundingMines = 0;
 
-        // CODESMELL: feel this could be cleaner
+        // CODESMELL: feel this could be cleaner Use the dsurrounding thing to create it
         if (row > 0) {
             // TOP LEFT
             if (col > 0) {
@@ -137,6 +143,11 @@ public class MineGrid {
 
     // TODO_POSS maybe return a value for what the result of clicking this cell is
     public void ClickMineCell(int i, int j) {
+        // Error Checking to make sure there is a valid item;
+        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
+            return;
+        }
+
         // Don't want the user to die on the initial click
         if (this.gameState == GameState.NEWGAME) {
             while (this.mineGrid.get(i).get(j).getIsMine()) {
@@ -145,22 +156,99 @@ public class MineGrid {
 
             this.gameState = GameState.STARTED;
         }
-        else if (this.gameState == GameState.STARTED) {
+
+        if (this.gameState == GameState.STARTED) {
             // Now check the cell itself
             MineCell clickedCell = this.mineGrid.get(i).get(j);
             if (clickedCell.getCellState() == MineCell.CellState.UNCLICKED) {
-                clickedCell.setCellState(MineCell.CellState.CLICKED);
-
                 if (clickedCell.getIsMine()) {
+                    clickedCell.setCellState(MineCell.CellState.CLICKED);
                     this.gameState = GameState.LOST;
                 }
                 else {
-                    this.exposedCells++;
+                    if (clickedCell.getNumSurroundingMines() == 0) {
+                        // TEMPORARY DISABLE, this is the next step;
+                        ExpandExposedCells(i, j);
+                    } else {
+                        clickedCell.setCellState(MineCell.CellState.CLICKED);
+                        this.exposedCells++;
+                    }
+
                     if (this.numRows * this.numCols - this.numMines == this.exposedCells) {
                         this.gameState = GameState.WON;
                     }
+
+                    Log.d("What", this.numRows+", "+this.numCols+": "+this.numCols+ " remaining: "+ this.exposedCells);
                 }
             }
+        }
+    }
+
+    private List<GridIndex> GetSurroundingCells(int row, int col) {
+       List<GridIndex> surroundingCellIndexList = new ArrayList<GridIndex>();
+
+        // CODESMELL: feel this could be cleaner, not sre if I really need a GridIndex
+        if (row > 0) {
+            // TOP LEFT
+            if (col > 0) {
+                surroundingCellIndexList.add(new GridIndex(row - 1, col - 1));
+            }
+            // TOP RIGHT
+            if (col < this.numCols - 1) {
+                surroundingCellIndexList.add(new GridIndex(row - 1, col + 1));
+            }
+            // TOP MIDDLE
+            surroundingCellIndexList.add(new GridIndex(row - 1, col));
+        }
+        if (row < this.numRows - 1) {
+            // BOTTOM LEFT
+            if (col > 0) {
+                surroundingCellIndexList.add(new GridIndex(row + 1, col - 1));
+            }
+            // BOTTOM RIGHT
+            if (col < this.numCols - 1) {
+                surroundingCellIndexList.add(new GridIndex(row + 1, col + 1));
+            }
+            // BOTTOM MIDDLE
+            surroundingCellIndexList.add(new GridIndex(row + 1, col));
+        }
+
+        // MIDDLE LEFT
+        if (col > 0) {
+            surroundingCellIndexList.add(new GridIndex(row, col - 1));
+        }
+        // MIDDLE RIGHT
+        if (col < this.numCols - 1) {
+            surroundingCellIndexList.add(new GridIndex(row, col + 1));
+        }
+
+        return surroundingCellIndexList;
+    }
+
+    // Add
+    private void ExpandExposedCells(int row, int col) {
+        List<GridIndex> checkCandidates = new ArrayList<GridIndex>();
+
+        checkCandidates.add(new GridIndex(row, col));
+
+        while (checkCandidates.size() > 0) {
+            List<GridIndex> surroundingCells = GetSurroundingCells(checkCandidates.get(0).row, checkCandidates.get(0).col);
+            for (int i = 0; i < surroundingCells.size(); i++) {
+                MineCell checkCell = this.mineGrid.get(surroundingCells.get(i).row).get(surroundingCells.get(i).col);
+
+                if (checkCell.getCellState() == MineCell.CellState.UNCLICKED) {
+                    checkCell.setCellState(MineCell.CellState.CLICKED);
+                    this.exposedCells++;
+
+                    if (checkCell.getNumSurroundingMines() == 0) {
+                        checkCandidates.add(new GridIndex(surroundingCells.get(i).row, surroundingCells.get(i).col));
+                    }
+                }
+            }
+
+            MineCell candidateCell = this.mineGrid.get(checkCandidates.get(0).row).get(checkCandidates.get(0).col);
+            // A 0th one in the second loop (already added
+            checkCandidates.remove(0);
         }
     }
 }

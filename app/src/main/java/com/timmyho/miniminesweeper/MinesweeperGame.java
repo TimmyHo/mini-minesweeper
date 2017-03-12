@@ -23,8 +23,8 @@ public class MinesweeperGame extends AppCompatActivity {
         setContentView(R.layout.activity_minesweeper_game);
 
         // TEST_CODE
-        myGrid = new MineGrid(10, 10, 10);
-
+        //myGrid = new MineGrid(10, 10, 10);
+        myGrid = new MineGrid(5, 5, 5);
         /*
         // TEST_CODE, will need to replace this with the ui
         Random rand = new Random();
@@ -32,7 +32,8 @@ public class MinesweeperGame extends AppCompatActivity {
             myGrid.ClickMineCell(rand.nextInt(10), rand.nextInt(10));
         }
         */
-
+        // PROTO_ONLY
+        myGrid.ClickMineCell(1,2);
         UpdateMinesweeperGrid();
     }
 
@@ -40,15 +41,20 @@ public class MinesweeperGame extends AppCompatActivity {
         EditText rowText = (EditText) findViewById(R.id.rowText);
         EditText colText = (EditText) findViewById(R.id.colText);
 
-        Integer rowIndex = Integer.parseInt(rowText.getText().toString());
-        Integer colIndex = Integer.parseInt(colText.getText().toString());
-        myGrid.ClickMineCell(rowIndex, colIndex);
+        try {
+            Integer rowIndex = Integer.parseInt(rowText.getText().toString());
+            Integer colIndex = Integer.parseInt(colText.getText().toString());
+            myGrid.ClickMineCell(rowIndex, colIndex);
 
-        UpdateMinesweeperGrid();
+            UpdateMinesweeperGrid();
+        } catch (NumberFormatException ex) {
+            // Do nothing, Invalid number
+        }
     }
 
     public void resetMinesweeperGameClick(View view) {
         myGrid = new MineGrid(10, 10, 10);
+        myGrid = new MineGrid(5, 5, 5);
         UpdateMinesweeperGrid();
     }
 
