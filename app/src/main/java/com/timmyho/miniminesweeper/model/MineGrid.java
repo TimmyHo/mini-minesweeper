@@ -91,16 +91,26 @@ public class MineGrid {
             for (int j = 0; j < this.numCols; j++) {
                 // CODE_SMELL: could be a place for an enum/string literal
                 String mineChar = "";
-                if (this.mineGrid.get(i).get(j).getIsMine() == true) {
-                    mineChar = "M";
+                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
+                    mineChar = "U";
                 }
                 else {
-                    mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
+                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
+                        mineChar = "M";
+                    } else {
+                        mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
+                    }
                 }
                 gridAsString += mineChar+" ";
             }
             gridAsString += "\n";
         }
         return gridAsString;
+    }
+
+    // TODO_POSS mahbe return a value for what the result of clicking this cell is
+    public void ClickMineCell(int i, int j) {
+        // TODO: This should check if it is flagged or clicked already and not do anything if it is
+        this.mineGrid.get(i).get(j).setCellState(MineCell.CellState.CLICKED);
     }
 }

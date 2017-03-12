@@ -21,11 +21,21 @@ public class MineCell {
         return this.isMine;
     }
 
+    public Integer getNumSurroundingMines() {
+        return this.numSurroundingMines;
+    }
+
     public void setNumSurroundingMines(Integer numSurroundingMines) {
         this.numSurroundingMines = numSurroundingMines;
     }
 
-    public Integer getNumSurroundingMines() {
-        return this.numSurroundingMines;
+    public CellState getCellState()
+    {
+        return this.cellState;
+    }
+
+    public void setCellState(CellState cellState)
+    {
+        this.cellState = cellState;
     }
 }
