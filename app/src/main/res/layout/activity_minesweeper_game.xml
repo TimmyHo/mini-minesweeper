@@ -54,14 +54,23 @@
         </LinearLayout>
     </LinearLayout>
 
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="12pt"
+        android:id="@+id/gameStateText"/>
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:text="TODO: Minesweeper grid"
+        android:layout_gravity="center"
         android:gravity="center"
         android:background="#00FFFF"
-        android:id="@+id/minesweeperGrid"
-        android:typeface="monospace"/>
+        android:id="@+id/minesweeperGridView"
+        android:typeface="monospace"
+        android:padding="25dp"/>
 
     <!-- PROTO_ONLY this is a temp UI -->
     <LinearLayout

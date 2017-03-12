@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,14 +25,13 @@ public class MinesweeperGame extends AppCompatActivity {
         // TEST_CODE
         myGrid = new MineGrid(10, 10, 10);
 
-
-        Log.d("MineGridInit", myGrid.GetMineGridToString());
-
+        /*
         // TEST_CODE, will need to replace this with the ui
         Random rand = new Random();
         for (int i = 0; i < 10; i++) {
             myGrid.ClickMineCell(rand.nextInt(10), rand.nextInt(10));
         }
+        */
 
         UpdateMinesweeperGrid();
     }
@@ -55,7 +55,24 @@ public class MinesweeperGame extends AppCompatActivity {
     private void UpdateMinesweeperGrid() {
         Log.d("MineGridInit", myGrid.GetMineGridToString());
 
-        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGrid);
+        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGridView);
         minesweeperGrid.setText(myGrid.GetMineGridToString());
+
+        MineGrid.GameState gameState = myGrid.GetGameState();
+
+        TextView gameStateText = (TextView) findViewById(R.id.gameStateText);
+        gameStateText.setText(gameState.toString());
+
+        // TODO_CLEANUP: Maybe a class or something (so there's no need for so many if/switch
+        // statements
+        if (gameState == MineGrid.GameState.NEWGAME) {
+            gameStateText.setTextColor(Color.BLACK);
+        } else if (gameState == MineGrid.GameState.STARTED){
+            gameStateText.setTextColor(Color.DKGRAY);
+        } else if (gameState == MineGrid.GameState.WON){
+            gameStateText.setTextColor(Color.GREEN);
+        } else if (gameState == MineGrid.GameState.LOST){
+            gameStateText.setTextColor(Color.RED);
+        }
     }
 }

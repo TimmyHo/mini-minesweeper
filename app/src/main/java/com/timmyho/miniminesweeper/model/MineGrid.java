@@ -22,7 +22,7 @@ public class MineGrid {
     // CODE_SMELL? pick a better name
     private int exposedCells;
 
-    enum GameState { NEWGAME, STARTED, LOST, WON }
+    public enum GameState { NEWGAME, STARTED, LOST, WON }
 
     public MineGrid(int rows, int cols, int numMines) {
         this.numRows = rows;
@@ -58,7 +58,7 @@ public class MineGrid {
         this.exposedCells = 0;
     }
 
-    private GameState GetGameState() {
+    public GameState GetGameState() {
         return this.gameState;
     }
 
