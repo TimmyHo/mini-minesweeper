@@ -60,7 +60,8 @@
         android:text="TODO: Minesweeper grid"
         android:gravity="center"
         android:background="#00FFFF"
-        android:id="@+id/minesweeperGrid"/>
+        android:id="@+id/minesweeperGrid"
+        android:typeface="monospace"/>
 
     <!-- PROTO_ONLY this is a temp UI -->
     <LinearLayout
@@ -99,5 +100,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="RESET"/>
+        android:text="RESET"
+        android:onClick="resetMinesweeperGameClick"/>
 </LinearLayout>

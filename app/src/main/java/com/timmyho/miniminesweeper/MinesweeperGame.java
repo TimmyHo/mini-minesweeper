@@ -32,10 +32,8 @@ public class MinesweeperGame extends AppCompatActivity {
         for (int i = 0; i < 10; i++) {
             myGrid.ClickMineCell(rand.nextInt(10), rand.nextInt(10));
         }
-        Log.d("MineGridInit", myGrid.GetMineGridToString());
 
-        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGrid);
-        minesweeperGrid.setText(myGrid.GetMineGridToString());
+        UpdateMinesweeperGrid();
     }
 
     public void cellClick(View view) {
@@ -46,6 +44,15 @@ public class MinesweeperGame extends AppCompatActivity {
         Integer colIndex = Integer.parseInt(colText.getText().toString());
         myGrid.ClickMineCell(rowIndex, colIndex);
 
+        UpdateMinesweeperGrid();
+    }
+
+    public void resetMinesweeperGameClick(View view) {
+        myGrid = new MineGrid(10, 10, 10);
+        UpdateMinesweeperGrid();
+    }
+
+    private void UpdateMinesweeperGrid() {
         Log.d("MineGridInit", myGrid.GetMineGridToString());
 
         TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGrid);
