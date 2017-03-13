@@ -36,28 +36,17 @@ public class MineGrid {
     private void GenerateMineGrid() {
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
 
-        // PROTO_ONLY only to ensure the mines work, this needs to be replaced by a way to
-        // randomly generate the mine field;
         int numRandomMines = 0;
-        Random rand = new Random();
         for (int i = 0; i < this.numRows; i++) {
             ArrayList<MineCell> mineRow = new ArrayList<MineCell>();
             for (int j = 0; j < this.numCols; j++) {
-                boolean addMine = rand.nextInt(10) == 0;
-                addMine = false;
-                if (i == 2 && j == 2)
-                {
-                    addMine = true;
-                }
-                MineCell cell = new MineCell(addMine);
-                numRandomMines += addMine ? 1: 0;
+                MineCell cell = new MineCell(false);
                 mineRow.add(cell);
             }
             this.mineGrid.add(mineRow);
         }
 
-        // PROTO_ONLY
-        this.numMines = numRandomMines;
+        this.PlaceMines();
 
         this.CalculateSurroundingMines();
         this.gameState = GameState.NEWGAME;
@@ -66,6 +55,23 @@ public class MineGrid {
 
     public GameState GetGameState() {
         return this.gameState;
+    }
+
+    private void PlaceMines() {
+        Random rand = new Random(0);
+
+        int placedMines = 0;
+        while (placedMines < this.numMines) {
+
+            int row = rand.nextInt(this.numRows);
+            int col = rand.nextInt(this.numCols);
+            MineCell cell = mineGrid.get(row).get(col);
+
+            if (!cell.getIsMine()) {
+                mineGrid.get(row).set(col, new MineCell(true));
+                placedMines++;
+            }
+        }
     }
 
     private void CalculateSurroundingMines() {

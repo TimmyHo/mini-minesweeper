@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
 
@@ -23,15 +24,7 @@ public class MinesweeperGame extends AppCompatActivity {
         setContentView(R.layout.activity_minesweeper_game);
 
         // TEST_CODE
-        //myGrid = new MineGrid(10, 10, 10);
-        myGrid = new MineGrid(5, 5, 5);
-        /*
-        // TEST_CODE, will need to replace this with the ui
-        Random rand = new Random();
-        for (int i = 0; i < 10; i++) {
-            myGrid.ClickMineCell(rand.nextInt(10), rand.nextInt(10));
-        }
-        */
+        myGrid = new MineGrid(10, 10, 10);
         // PROTO_ONLY
         myGrid.ClickMineCell(1,2);
         UpdateMinesweeperGrid();
@@ -48,13 +41,12 @@ public class MinesweeperGame extends AppCompatActivity {
 
             UpdateMinesweeperGrid();
         } catch (NumberFormatException ex) {
-            // Do nothing, Invalid number
+            // PRETTIFY cleanup stuff return toast message
         }
     }
 
     public void resetMinesweeperGameClick(View view) {
         myGrid = new MineGrid(10, 10, 10);
-        myGrid = new MineGrid(5, 5, 5);
         UpdateMinesweeperGrid();
     }
 
