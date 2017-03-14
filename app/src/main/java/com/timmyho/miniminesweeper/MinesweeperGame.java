@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
+import com.timmyho.miniminesweeper.utilities.ImageAdapter;
 
 import java.util.Random;
 
@@ -80,6 +81,10 @@ public class MinesweeperGame extends AppCompatActivity {
 //
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
         minesweeperUI.setAdapter(minesweeperUIAdapter);
+
+        ImageAdapter newAdapter = new ImageAdapter(this);
+        minesweeperUI.setAdapter(newAdapter);
+
 
 /*        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGridView);
         minesweeperGrid.setText(myGrid.GetMineGridToString());
