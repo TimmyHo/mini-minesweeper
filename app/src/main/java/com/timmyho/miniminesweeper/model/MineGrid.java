@@ -147,6 +147,30 @@ public class MineGrid {
         return gridAsString;
     }
 
+    public List<String> GetMineGridToStringArray() {
+        List<String> mineGridAsStringArray = new ArrayList<String>();
+
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                // CODE_SMELL: could be a place for an enum/string literal
+                String mineChar = "";
+                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
+                    mineChar = "U";
+                }
+                else {
+                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
+                        mineChar = "M";
+                    } else {
+                        mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
+                    }
+                }
+                mineGridAsStringArray.add(mineChar);
+            }
+        }
+
+        return mineGridAsStringArray;
+    }
+
     // TODO_POSS maybe return a value for what the result of clicking this cell is
     public void ClickMineCell(int i, int j) {
         // Error Checking to make sure there is a valid item;

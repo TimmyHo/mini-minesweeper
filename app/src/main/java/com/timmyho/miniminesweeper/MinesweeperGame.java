@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +28,28 @@ public class MinesweeperGame extends AppCompatActivity {
 
         // TEST_CODE
         myGrid = new MineGrid(10, 10, 10);
+        initializeMinesweeperUI();
+
         // PROTO_ONLY
-        myGrid.ClickMineCell(1,2);
+//        myGrid.ClickMineCell(1,2);
         UpdateMinesweeperGrid();
+    }
+
+    private void initializeMinesweeperUI() {
+        GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
+
+        minesweeperUI.setNumColumns(10);
+        minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
+
+        minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+
+                Log.d("clickCheck","I'm clicking at ["+position/10+", "+position % 10+"]");
+                myGrid.ClickMineCell(position / 10, position % 10);
+                UpdateMinesweeperGrid();
+                }
+        });
     }
 
     public void cellClick(View view) {
@@ -53,13 +75,21 @@ public class MinesweeperGame extends AppCompatActivity {
     private void UpdateMinesweeperGrid() {
         Log.d("MineGridInit", myGrid.GetMineGridToString());
 
-        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGridView);
-        minesweeperGrid.setText(myGrid.GetMineGridToString());
+        ArrayAdapter<String> minesweeperUIAdapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_list_item_1, myGrid.GetMineGridToStringArray());
+//
+        GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
+        minesweeperUI.setAdapter(minesweeperUIAdapter);
 
+/*        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGridView);
+        minesweeperGrid.setText(myGrid.GetMineGridToString());
+*/
         MineGrid.GameState gameState = myGrid.GetGameState();
 
         TextView gameStateText = (TextView) findViewById(R.id.gameStateText);
         gameStateText.setText(gameState.toString());
+
+
 
         // TODO_CLEANUP: Maybe a class or something (so there's no need for so many if/switch
         // statements
