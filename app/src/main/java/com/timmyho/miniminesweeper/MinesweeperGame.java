@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -82,7 +83,9 @@ public class MinesweeperGame extends AppCompatActivity {
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
         minesweeperUI.setAdapter(minesweeperUIAdapter);
 
-        ImageAdapter newAdapter = new ImageAdapter(this);
+        Log.d("minesweeperWidths", "width: "+minesweeperUI.getWidth()+", numColumns: "+minesweeperUI.getNumColumns());
+
+        ImageAdapter newAdapter = new ImageAdapter(this, Resources.getSystem().getDisplayMetrics().widthPixels/10);
         minesweeperUI.setAdapter(newAdapter);
 
 

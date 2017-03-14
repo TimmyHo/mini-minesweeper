@@ -1,6 +1,7 @@
 package com.timmyho.miniminesweeper.utilities;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -15,9 +16,11 @@ import com.timmyho.miniminesweeper.R;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    private int columnWidth;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, int columnWidth) {
         mContext = c;
+        this.columnWidth = columnWidth;
     }
 
     public long getItemId(int position) {
@@ -29,6 +32,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
+        //PROTO_ONLY
         return 100;
     }
 
@@ -36,16 +40,18 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if (convertView == null) {
+            Log.d("colWidth", "column width = "+this.columnWidth);
+
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
-            // imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+            imageView.setLayoutParams(new GridView.LayoutParams(this.columnWidth, this.columnWidth));
             imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            //imageView.setPadding(8, 8, 8, 8);
+
         } else {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(R.drawable.Mine);
+        imageView.setImageResource(R.drawable.mine);
         return imageView;
     }
 }
