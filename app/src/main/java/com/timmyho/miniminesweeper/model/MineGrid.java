@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by timot on 3/10/2017.
@@ -22,6 +24,10 @@ public class MineGrid {
     private int numMines;
     private int flaggedCells;
     private GameState gameState;
+
+    private long timeTaken;
+    private Timer timer;
+    private TimerTask timerTask;
 
     private static List<Integer> imageIds = Arrays.asList(
             R.drawable.cell0,
@@ -39,14 +45,24 @@ public class MineGrid {
     // CODE_SMELL? pick a better name
     private int exposedCells;
 
-    public enum GameState { NEWGAME, STARTED, LOST, WON }
+    public enum GameState { NEWGAME, STARTED, PAUSED, LOST, WON }
 
     public MineGrid(int rows, int cols, int numMines) {
         this.numRows = rows;
         this.numCols = cols;
         this.numMines = numMines;
-
         GenerateMineGrid();
+
+        this.timer = new Timer();
+        this.timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (gameState == GameState.STARTED) {
+                    timeTaken++;
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
 
     private void GenerateMineGrid() {
@@ -68,6 +84,7 @@ public class MineGrid {
         this.gameState = GameState.NEWGAME;
         this.exposedCells = 0;
         this.flaggedCells = 0;
+        this.timeTaken = 0;
     }
 
     public GameState GetGameState() {
@@ -76,9 +93,14 @@ public class MineGrid {
 
     public int GetNumFlaggedCells() { return this.flaggedCells; }
 
+    public long GetTimeTaken() { return this.timeTaken; }
+
     private void PlaceMines() {
         Random rand = new Random(0);
 
+        // OPT? The other option (to have it = numMines) is to generate an array of all possible
+        // values and then take a random number, add a mine at that index and remove it from the
+        // list though this adds more space requirements
         int placedMines = 0;
         while (placedMines < this.numMines) {
 

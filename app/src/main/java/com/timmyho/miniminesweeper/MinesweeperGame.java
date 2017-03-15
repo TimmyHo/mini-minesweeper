@@ -2,6 +2,8 @@ package com.timmyho.miniminesweeper;
 
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,8 @@ import android.widget.Toast;
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.utilities.ImageAdapter;
 
+import org.w3c.dom.Text;
+
 import java.util.Random;
 
 public class MinesweeperGame extends AppCompatActivity {
@@ -26,18 +30,39 @@ public class MinesweeperGame extends AppCompatActivity {
     private int numCols = 10;
     private int numMines = 10;
 
+    private long maxTime = 999;
+
+    final Handler timerHandler = new Handler();
+    Runnable timerRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_minesweeper_game);
 
-        // TEST_CODE
         myGrid = new MineGrid(numRows, numCols, numMines);
         initializeMinesweeperUI();
 
-        // PROTO_ONLY
-//        myGrid.ClickMineCell(1,2);
         UpdateMinesweeperGrid();
+
+        // This seems a bit weird, because I am keeping two background tasks, one for the game logic
+        // (in MineGrid.java) and then another one here (to update the UI). It makes the structure
+        // better (since there is no play, pause, stop, etc... here but may not be the best use of
+        // resources
+        timerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                long timeDisplayed = Math.min(myGrid.GetTimeTaken(), maxTime);
+
+                TextView timerText = (TextView) findViewById(R.id.timerText);
+                timerText.setText(String.format("%03d", timeDisplayed));
+
+                timerHandler.postDelayed(this, 1000);
+            }
+
+        };
+        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     private void initializeMinesweeperUI() {
@@ -66,6 +91,8 @@ public class MinesweeperGame extends AppCompatActivity {
                 return true;
             }
         });
+
+
     }
 
     public void cellClick(View view) {
