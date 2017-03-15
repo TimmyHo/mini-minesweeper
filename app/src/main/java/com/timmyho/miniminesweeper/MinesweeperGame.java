@@ -55,6 +55,17 @@ public class MinesweeperGame extends AppCompatActivity {
                 UpdateMinesweeperGrid();
                 }
         });
+
+        minesweeperUI.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+
+                Log.d("clickCheck", "I'm flagging at [" + position / numCols + ", " + position % numCols + "]");
+                myGrid.FlagMineCell(position / numCols, position % numCols);
+                UpdateMinesweeperGrid();
+                return true;
+            }
+        });
     }
 
     public void cellClick(View view) {
@@ -73,7 +84,7 @@ public class MinesweeperGame extends AppCompatActivity {
     }
 
     public void resetMinesweeperGameClick(View view) {
-        myGrid = new MineGrid(10, 10, 10);
+        myGrid = new MineGrid(numRows, numCols, numMines);
         UpdateMinesweeperGrid();
     }
 
@@ -97,8 +108,6 @@ public class MinesweeperGame extends AppCompatActivity {
 
         TextView gameStateText = (TextView) findViewById(R.id.gameStateText);
         gameStateText.setText(gameState.toString());
-
-
 
         // TODO_CLEANUP: Maybe a class or something (so there's no need for so many if/switch
         // statements

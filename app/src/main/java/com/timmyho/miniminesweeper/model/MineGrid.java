@@ -20,6 +20,7 @@ public class MineGrid {
     private int numRows;
     private int numCols;
     private int numMines;
+    private int flaggedCells;
     private GameState gameState;
 
     private static List<Integer> imageIds = Arrays.asList(
@@ -66,6 +67,7 @@ public class MineGrid {
         this.CalculateSurroundingMines();
         this.gameState = GameState.NEWGAME;
         this.exposedCells = 0;
+        this.flaggedCells = 0;
     }
 
     public GameState GetGameState() {
@@ -139,6 +141,8 @@ public class MineGrid {
     }
 
     // CODE_SMELL: could possibly override ToString?
+    // CLEANUP Decide if we need these, if we don't then delete, else clean them up
+    // Missing flag and clicked on mine
     public String GetMineGridToString() {
         String gridAsString = "";
         for (int i = 0; i < this.numRows; i++) {
@@ -191,21 +195,23 @@ public class MineGrid {
 
         for (int i = 0; i < this.numRows; i++) {
             for (int j = 0; j < this.numCols; j++) {
-                MineCell cell = this.mineGrid.get(i).get(j);
+                MineCell currentCell = this.mineGrid.get(i).get(j);
                 // CODE_SMELL: could be a place for an enum/string literal
                 Integer cellId = R.drawable.unclicked;
-                if (cell.getCellState() == MineCell.CellState.UNCLICKED) {
+                if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
                     cellId = R.drawable.unclicked;
                 }
-                else {
-                    if (cell.getIsMine() == true) {
-                        if (cell.getCellState() == MineCell.CellState.CLICKED_LOST) {
+                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
+                    cellId = R.drawable.flag;
+                } else {
+                    if (currentCell.getIsMine() == true) {
+                        if (currentCell.getCellState() == MineCell.CellState.CLICKED_LOST) {
                             cellId = R.drawable.mine_clicked;
                         } else {
                             cellId = R.drawable.mine;
                         }
                     } else {
-                        cellId = MineGrid.imageIds.get(cell.getNumSurroundingMines());
+                        cellId = MineGrid.imageIds.get(currentCell.getNumSurroundingMines());
                     }
                 }
                 mineGridAsImageIdList.add(cellId);
@@ -255,6 +261,23 @@ public class MineGrid {
                     }
                 }
             }
+        }
+    }
+
+    public void FlagMineCell(int i, int j) {
+        // Error Checking to make sure there is a valid item;
+        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
+            return;
+        }
+
+        MineCell selectedCell = this.mineGrid.get(i).get(j);
+
+        if (selectedCell.getCellState() == MineCell.CellState.FLAGGED) {
+            selectedCell.setCellState(MineCell.CellState.UNCLICKED);
+            this.flaggedCells--;
+        } else if (selectedCell.getCellState() == MineCell.CellState.UNCLICKED) {
+            selectedCell.setCellState(MineCell.CellState.FLAGGED);
+            this.flaggedCells++;
         }
     }
 
