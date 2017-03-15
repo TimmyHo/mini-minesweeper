@@ -203,6 +203,8 @@ public class MineGrid {
                 }
                 else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
                     cellId = R.drawable.flag;
+                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
+                    cellId = R.drawable.no_mine;
                 } else {
                     if (currentCell.getIsMine() == true) {
                         if (currentCell.getCellState() == MineCell.CellState.CLICKED_LOST) {
@@ -288,6 +290,10 @@ public class MineGrid {
 
                 if (cell.getIsMine() && cell.getCellState() == MineCell.CellState.UNCLICKED) {
                     cell.setCellState(MineCell.CellState.CLICKED);
+                }
+
+                if (cell.getCellState() == MineCell.CellState.FLAGGED && !cell.getIsMine()) {
+                    cell.setCellState(MineCell.CellState.FLAGGED_WRONG);
                 }
             }
         }

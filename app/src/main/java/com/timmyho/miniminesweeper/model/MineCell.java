@@ -9,7 +9,7 @@ public class MineCell {
     Integer numSurroundingMines;
     CellState cellState;
 
-    enum CellState { UNCLICKED, CLICKED, CLICKED_LOST, FLAGGED }
+    enum CellState { UNCLICKED, CLICKED, CLICKED_LOST, FLAGGED, FLAGGED_WRONG }
 
     public MineCell(Boolean isMine) {
         this.isMine = isMine;
