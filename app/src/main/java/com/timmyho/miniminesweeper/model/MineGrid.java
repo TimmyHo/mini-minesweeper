@@ -191,16 +191,21 @@ public class MineGrid {
 
         for (int i = 0; i < this.numRows; i++) {
             for (int j = 0; j < this.numCols; j++) {
+                MineCell cell = this.mineGrid.get(i).get(j);
                 // CODE_SMELL: could be a place for an enum/string literal
                 Integer cellId = R.drawable.unclicked;
-                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
+                if (cell.getCellState() == MineCell.CellState.UNCLICKED) {
                     cellId = R.drawable.unclicked;
                 }
                 else {
-                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
-                        cellId = R.drawable.mine;
+                    if (cell.getIsMine() == true) {
+                        if (cell.getCellState() == MineCell.CellState.CLICKED_LOST) {
+                            cellId = R.drawable.mine_clicked;
+                        } else {
+                            cellId = R.drawable.mine;
+                        }
                     } else {
-                        cellId = MineGrid.imageIds.get(this.mineGrid.get(i).get(j).getNumSurroundingMines());
+                        cellId = MineGrid.imageIds.get(cell.getNumSurroundingMines());
                     }
                 }
                 mineGridAsImageIdList.add(cellId);
@@ -231,12 +236,13 @@ public class MineGrid {
             MineCell clickedCell = this.mineGrid.get(i).get(j);
             if (clickedCell.getCellState() == MineCell.CellState.UNCLICKED) {
                 if (clickedCell.getIsMine()) {
-                    clickedCell.setCellState(MineCell.CellState.CLICKED);
+                    clickedCell.setCellState(MineCell.CellState.CLICKED_LOST);
+                    ShowMines();
+
                     this.gameState = GameState.LOST;
                 }
                 else {
                     if (clickedCell.getNumSurroundingMines() == 0) {
-                        // TEMPORARY DISABLE, this is the next step;
                         ExpandExposedCells(i, j);
                     } else {
                         clickedCell.setCellState(MineCell.CellState.CLICKED);
@@ -244,10 +250,21 @@ public class MineGrid {
                     }
 
                     if (this.numRows * this.numCols - this.numMines == this.exposedCells) {
+                        ShowMines();
                         this.gameState = GameState.WON;
                     }
+                }
+            }
+        }
+    }
 
-                    Log.d("What", this.numRows+", "+this.numCols+": "+this.numCols+ " remaining: "+ this.exposedCells);
+    private void ShowMines() {
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                MineCell cell = this.mineGrid.get(i).get(j);
+
+                if (cell.getIsMine() && cell.getCellState() == MineCell.CellState.UNCLICKED) {
+                    cell.setCellState(MineCell.CellState.CLICKED);
                 }
             }
         }
