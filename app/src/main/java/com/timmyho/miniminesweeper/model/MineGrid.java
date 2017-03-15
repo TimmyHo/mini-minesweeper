@@ -74,6 +74,8 @@ public class MineGrid {
         return this.gameState;
     }
 
+    public int GetNumFlaggedCells() { return this.flaggedCells; }
+
     private void PlaceMines() {
         Random rand = new Random(0);
 

@@ -34,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5px"
                 android:text="0"
+                android:id="@+id/numMinesText"
                 android:textColor="#FF0000"/>
         </LinearLayout>
         <LinearLayout

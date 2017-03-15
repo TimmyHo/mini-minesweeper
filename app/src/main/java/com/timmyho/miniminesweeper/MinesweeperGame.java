@@ -120,5 +120,9 @@ public class MinesweeperGame extends AppCompatActivity {
         } else if (gameState == MineGrid.GameState.LOST){
             gameStateText.setTextColor(Color.RED);
         }
+
+        TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
+
+        numMinesText.setText(String.valueOf(this.numMines-this.myGrid.GetNumFlaggedCells()));
     }
 }
