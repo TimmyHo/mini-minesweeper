@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
+import com.timmyho.miniminesweeper.utilities.HighScoreEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.ImageAdapter;
 
 import org.w3c.dom.Text;
@@ -161,6 +163,8 @@ public class MinesweeperGame extends AppCompatActivity {
         intent.putExtra("name", "Tim");
         intent.putExtra("score", 420);
 
-        startActivity(intent);
+        //startActivity(intent);
+        DialogFragment newFragment = new HighScoreEntryDialogFragment();
+        newFragment.show(getFragmentManager(), "highScore");
     }
 }
