@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -22,11 +23,18 @@ public class HighScoreList extends AppCompatActivity {
         setContentView(R.layout.activity_high_score_list);
 
 
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("name");
+        int score = intent.getIntExtra("score", -1);
+
+        Log.d("newIntentInfo", "From previous page: "+name+" has a score of "+score);
+
 
         this.highScoreDB = openOrCreateDatabase("HighScoreDB", MODE_PRIVATE, null);
 
         // PROTO_ONLY this is just so I can fill the table up with random information to
         // ensure it works
+        /*
         this.highScoreDB.execSQL("drop table if exists scoreList");
         this.highScoreDB.execSQL("create table if not exists scoreList (" +
                 "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
@@ -37,8 +45,11 @@ public class HighScoreList extends AppCompatActivity {
             this.highScoreDB.execSQL(
                 "INSERT into scoreList (name, score) VALUES (\"Bob\", " + i + ");");
         }
-        Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+paginateValue, null);
+        */
 
+        this.highScoreDB.execSQL(String.format("INSERT INTO scoreList (name, score) VALUES (\"%s\", %d);", name, score));
+
+        Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+paginateValue, null);
 
         DisplayNewScores(cr);
     }

@@ -1,5 +1,6 @@
 package com.timmyho.miniminesweeper;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Handler;
@@ -151,5 +152,15 @@ public class MinesweeperGame extends AppCompatActivity {
         TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
 
         numMinesText.setText(String.valueOf(this.numMines-this.myGrid.GetNumFlaggedCells()));
+    }
+
+    public void goToScoresClick(View view) {
+        Intent intent = new Intent(this, HighScoreList.class);
+
+        // PROTO_ONLY just to make sure the passing of data works
+        intent.putExtra("name", "Tim");
+        intent.putExtra("score", 420);
+
+        startActivity(intent);
     }
 }
