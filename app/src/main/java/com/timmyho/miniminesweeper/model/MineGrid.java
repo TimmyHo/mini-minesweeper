@@ -1,9 +1,13 @@
 package com.timmyho.miniminesweeper.model;
 
+import android.graphics.Interpolator;
 import android.graphics.Point;
 import android.util.Log;
 
+import com.timmyho.miniminesweeper.R;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -17,6 +21,17 @@ public class MineGrid {
     private int numCols;
     private int numMines;
     private GameState gameState;
+
+    private static List<Integer> imageIds = Arrays.asList(
+            R.drawable.cell0,
+            R.drawable.cell1,
+            R.drawable.cell2,
+            R.drawable.cell3,
+            R.drawable.cell4,
+            R.drawable.cell5,
+            R.drawable.cell6,
+            R.drawable.cell7,
+            R.drawable.cell8);
 
     // techinically a misnomer because one click on a 0 will "expand"
     // This is meant to talk about the number of uncovered cells
@@ -169,6 +184,30 @@ public class MineGrid {
         }
 
         return mineGridAsStringArray;
+    }
+
+    public List<Integer> GetMineGridAsImageIds() {
+        List<Integer> mineGridAsImageIdList = new ArrayList<Integer>();
+
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                // CODE_SMELL: could be a place for an enum/string literal
+                Integer cellId = R.drawable.unclicked;
+                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
+                    cellId = R.drawable.unclicked;
+                }
+                else {
+                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
+                        cellId = R.drawable.mine;
+                    } else {
+                        cellId = MineGrid.imageIds.get(this.mineGrid.get(i).get(j).getNumSurroundingMines());
+                    }
+                }
+                mineGridAsImageIdList.add(cellId);
+            }
+        }
+
+        return mineGridAsImageIdList;
     }
 
     // TODO_POSS maybe return a value for what the result of clicking this cell is

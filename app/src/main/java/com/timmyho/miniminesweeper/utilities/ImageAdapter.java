@@ -10,16 +10,20 @@ import android.widget.BaseAdapter;
 
 import com.timmyho.miniminesweeper.R;
 
+import java.util.List;
+
 /**
  * Created by timot on 3/14/2017.
  */
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    List<Integer> imageIds;
     private int columnWidth;
 
-    public ImageAdapter(Context c, int columnWidth) {
+    public ImageAdapter(Context c, List<Integer> imageIds, int columnWidth) {
         mContext = c;
+        this.imageIds = imageIds;
         this.columnWidth = columnWidth;
     }
 
@@ -32,16 +36,13 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        //PROTO_ONLY
-        return 100;
+        return imageIds.size();
     }
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if (convertView == null) {
-            Log.d("colWidth", "column width = "+this.columnWidth);
-
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(this.columnWidth, this.columnWidth));
@@ -51,7 +52,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(R.drawable.mine);
+        imageView.setImageResource(imageIds.get(position));
         return imageView;
     }
 }

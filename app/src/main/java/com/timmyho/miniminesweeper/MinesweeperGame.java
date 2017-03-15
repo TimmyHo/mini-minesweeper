@@ -22,6 +22,9 @@ public class MinesweeperGame extends AppCompatActivity {
 
     // CODE_SMELL? Maybe this needs to be put in a model or a singleton instance
     MineGrid myGrid;
+    private int numRows = 10;
+    private int numCols = 10;
+    private int numMines = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +32,7 @@ public class MinesweeperGame extends AppCompatActivity {
         setContentView(R.layout.activity_minesweeper_game);
 
         // TEST_CODE
-        myGrid = new MineGrid(10, 10, 10);
+        myGrid = new MineGrid(numRows, numCols, numMines);
         initializeMinesweeperUI();
 
         // PROTO_ONLY
@@ -40,15 +43,15 @@ public class MinesweeperGame extends AppCompatActivity {
     private void initializeMinesweeperUI() {
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
-        minesweeperUI.setNumColumns(10);
+        minesweeperUI.setNumColumns(numCols);
         minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
 
         minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
 
-                Log.d("clickCheck","I'm clicking at ["+position/10+", "+position % 10+"]");
-                myGrid.ClickMineCell(position / 10, position % 10);
+                Log.d("clickCheck","I'm clicking at ["+position/numCols+", "+position % numCols+"]");
+                myGrid.ClickMineCell(position / numCols, position % numCols);
                 UpdateMinesweeperGrid();
                 }
         });
@@ -79,13 +82,11 @@ public class MinesweeperGame extends AppCompatActivity {
 
         ArrayAdapter<String> minesweeperUIAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_1, myGrid.GetMineGridToStringArray());
-//
+
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
         minesweeperUI.setAdapter(minesweeperUIAdapter);
 
-        Log.d("minesweeperWidths", "width: "+minesweeperUI.getWidth()+", numColumns: "+minesweeperUI.getNumColumns());
-
-        ImageAdapter newAdapter = new ImageAdapter(this, Resources.getSystem().getDisplayMetrics().widthPixels/10);
+        ImageAdapter newAdapter = new ImageAdapter(this, this.myGrid.GetMineGridAsImageIds(), Resources.getSystem().getDisplayMetrics().widthPixels/numCols);
         minesweeperUI.setAdapter(newAdapter);
 
 
