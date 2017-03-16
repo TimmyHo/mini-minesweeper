@@ -3,121 +3,70 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.timmyho.miniminesweeper.MinesweeperGame"
-    android:orientation="vertical">
+    tools:context="com.timmyho.miniminesweeper.MinesweeperGame">
 
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Minesweeper"
-        android:textSize="50dp"
-        android:gravity="center"
-        android:visibility="gone"/>
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_weight="1">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="bottom">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="8pt"
                 android:text="Mines"/>
             <TextView
+                android:id="@+id/numMinesText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5px"
-                android:text="0"
-                android:id="@+id/numMinesText"
-                android:textColor="#FF0000"/>
+                android:layout_marginLeft="10dp"
+                android:textSize="8pt"
+                android:textColor="#FF0000"
+                android:text="0"/>
         </LinearLayout>
-        <LinearLayout
+
+        <TextView
+            android:id="@+id/gameStateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="12pt"/>
+
+        <LinearLayout
             android:orientation="horizontal"
-            android:gravity="right"
-            android:layout_weight="1">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="bottom|right">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TIMER"/>
+                android:textSize="8pt"
+                android:text="Time"/>
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5px"
-                android:text="000"
                 android:id="@+id/timerText"
-                android:textColor="#FF0000"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:textSize="8pt"
+                android:textColor="#FF0000"
+                android:text="000"/>
         </LinearLayout>
     </LinearLayout>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="12pt"
-        android:id="@+id/gameStateText"/>
-    <TextView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:text="TODO: Minesweeper grid"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:background="#00FFFF"
-        android:id="@+id/minesweeperGridView"
-        android:typeface="monospace"
-        android:padding="25dp"
-        android:visibility="gone"/>
 
     <GridView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/minesweeperUI"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:background="#0000FF"
-        ></GridView>
-
-    <!-- PROTO_ONLY this is a temp UI -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Row:"/>
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:id="@+id/rowText"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:text="Col:"/>
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:id="@+id/colText"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px"
-            android:text="CHECK CELL"
-            android:onClick="cellClick"/>
-    </LinearLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -128,12 +77,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="RESET"
-            android:onClick="resetMinesweeperGameClick"/>
+            android:onClick="ResetMinesweeperGameClick"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Scores"
-            android:onClick="goToScoresClick"
-            android:layout_marginLeft="5px"/>
+            android:layout_marginLeft="10dp"
+            android:text="Times"
+            android:onClick="GoToBestTimesClick"/>
     </LinearLayout>
-    </LinearLayout>
+</LinearLayout>

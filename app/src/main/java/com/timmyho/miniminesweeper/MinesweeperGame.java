@@ -5,25 +5,17 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.ImageAdapter;
-
-import org.w3c.dom.Text;
-
-import java.util.Random;
 
 public class MinesweeperGame extends AppCompatActivity {
 
@@ -46,7 +38,7 @@ public class MinesweeperGame extends AppCompatActivity {
         myGrid = new MineGrid(numRows, numCols, numMines);
         initializeMinesweeperUI();
 
-        UpdateMinesweeperGrid();
+        updateMinesweeperGrid();
 
         // This seems a bit weird, because I am keeping two background tasks, one for the game logic
         // (in MineGrid.java) and then another one here (to update the UI). It makes the structure
@@ -71,69 +63,45 @@ public class MinesweeperGame extends AppCompatActivity {
     private void initializeMinesweeperUI() {
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
-        minesweeperUI.setNumColumns(numCols);
+        minesweeperUI.setNumColumns(this.numCols);
         minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
 
         minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-
-                Log.d("clickCheck","I'm clicking at ["+position/numCols+", "+position % numCols+"]");
                 myGrid.ClickMineCell(position / numCols, position % numCols);
-                UpdateMinesweeperGrid();
+                updateMinesweeperGrid();
                 }
         });
 
         minesweeperUI.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-
-                Log.d("clickCheck", "I'm flagging at [" + position / numCols + ", " + position % numCols + "]");
                 myGrid.FlagMineCell(position / numCols, position % numCols);
-                UpdateMinesweeperGrid();
+                updateMinesweeperGrid();
                 return true;
             }
         });
-
-
     }
 
-    public void cellClick(View view) {
-        EditText rowText = (EditText) findViewById(R.id.rowText);
-        EditText colText = (EditText) findViewById(R.id.colText);
 
-        try {
-            Integer rowIndex = Integer.parseInt(rowText.getText().toString());
-            Integer colIndex = Integer.parseInt(colText.getText().toString());
-            myGrid.ClickMineCell(rowIndex, colIndex);
-
-            UpdateMinesweeperGrid();
-        } catch (NumberFormatException ex) {
-            // PRETTIFY cleanup stuff return toast message
-        }
-    }
-
-    public void resetMinesweeperGameClick(View view) {
+    public void ResetMinesweeperGameClick(View view) {
         myGrid = new MineGrid(numRows, numCols, numMines);
-        UpdateMinesweeperGrid();
+        updateMinesweeperGrid();
     }
 
-    private void UpdateMinesweeperGrid() {
+    private void updateMinesweeperGrid() {
         Log.d("MineGridInit", myGrid.GetMineGridToString());
 
-        ArrayAdapter<String> minesweeperUIAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, myGrid.GetMineGridToStringArray());
-
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
-        minesweeperUI.setAdapter(minesweeperUIAdapter);
 
-        ImageAdapter newAdapter = new ImageAdapter(this, this.myGrid.GetMineGridAsImageIds(), Resources.getSystem().getDisplayMetrics().widthPixels/numCols);
-        minesweeperUI.setAdapter(newAdapter);
+        int colWidth = Resources.getSystem().getDisplayMetrics().widthPixels/numCols;
+        ImageAdapter minesweeperUiAdapter = new ImageAdapter(this, myGrid.GetMineGridAsImageIds(), colWidth);
+        minesweeperUI.setAdapter(minesweeperUiAdapter);
 
+        TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
+        numMinesText.setText(String.valueOf(this.numMines - myGrid.GetNumFlaggedCells()));
 
-/*        TextView minesweeperGrid = (TextView) findViewById(R.id.minesweeperGridView);
-        minesweeperGrid.setText(myGrid.GetMineGridToString());
-*/
         MineGrid.GameState gameState = myGrid.GetGameState();
 
         TextView gameStateText = (TextView) findViewById(R.id.gameStateText);
@@ -147,28 +115,25 @@ public class MinesweeperGame extends AppCompatActivity {
             gameStateText.setTextColor(Color.DKGRAY);
         } else if (gameState == MineGrid.GameState.WON){
             gameStateText.setTextColor(Color.GREEN);
+
+            showTimeEntryDialog();
         } else if (gameState == MineGrid.GameState.LOST){
             gameStateText.setTextColor(Color.RED);
         }
-
-        TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
-
-        numMinesText.setText(String.valueOf(this.numMines-this.myGrid.GetNumFlaggedCells()));
     }
 
-    public void goToScoresClick(View view) {
-        Intent intent = new Intent(this, HighScoreList.class);
-
-        // PROTO_ONLY just to make sure the passing of data works
-        intent.putExtra("name", "Tim");
-        intent.putExtra("score", 420);
-
-        //startActivity(intent);
+    private void showTimeEntryDialog() {
         DialogFragment newFragment = new BestTimeEntryDialogFragment();
         Bundle data = new Bundle();
         data.putLong("timeTaken", this.myGrid.GetTimeTaken());
         newFragment.setArguments(data);
 
         newFragment.show(getFragmentManager(), "highScore");
+    }
+
+    public void GoToBestTimesClick(View view) {
+        Intent intent = new Intent(this, HighScoreList.class);
+
+        startActivity(intent);
     }
 }
