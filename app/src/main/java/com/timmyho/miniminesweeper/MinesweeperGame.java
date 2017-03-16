@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
-import com.timmyho.miniminesweeper.utilities.ImageAdapter;
+import com.timmyho.miniminesweeper.utilities.MineCellAsImageAdapter;
 
 public class MinesweeperGame extends AppCompatActivity {
     MineGrid myGrid;
@@ -89,7 +89,7 @@ public class MinesweeperGame extends AppCompatActivity {
 
         // Update the UI
         int colWidth = Resources.getSystem().getDisplayMetrics().widthPixels/numCols;
-        ImageAdapter minesweeperUiAdapter = new ImageAdapter(this, myGrid.GetMineGridAsImageIds(), colWidth);
+        MineCellAsImageAdapter minesweeperUiAdapter = new MineCellAsImageAdapter(this, myGrid.GetMineGridAsImageIds(), colWidth);
         minesweeperUI.setAdapter(minesweeperUiAdapter);
 
         // Update ancillary (ie: non-game) elements

@@ -102,12 +102,12 @@ public class BestTimesList extends AppCompatActivity {
             } while (cr.moveToNext());
         }
 
-        ListView highScoreList = (ListView) findViewById(R.id.highScoreListView);
+        ListView bestTimesList = (ListView) findViewById(R.id.bestTimesListView);
 
         ArrayAdapter<String> highScoreListAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_1, times);
 
-        highScoreList.setAdapter(highScoreListAdapter);
+        bestTimesList.setAdapter(highScoreListAdapter);
 
         EnableOrDisablePagingButtons();
     }

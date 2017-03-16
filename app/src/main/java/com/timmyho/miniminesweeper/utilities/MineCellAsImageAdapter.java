@@ -16,12 +16,12 @@ import java.util.List;
  * Created by timot on 3/14/2017.
  */
 
-public class ImageAdapter extends BaseAdapter {
+public class MineCellAsImageAdapter extends BaseAdapter {
     private Context mContext;
     List<Integer> imageIds;
     private int columnWidth;
 
-    public ImageAdapter(Context c, List<Integer> imageIds, int columnWidth) {
+    public MineCellAsImageAdapter(Context c, List<Integer> imageIds, int columnWidth) {
         mContext = c;
         this.imageIds = imageIds;
         this.columnWidth = columnWidth;
