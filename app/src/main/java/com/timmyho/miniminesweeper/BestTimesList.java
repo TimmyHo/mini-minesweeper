@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,9 +28,6 @@ public class BestTimesList extends AppCompatActivity {
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         long timeTaken = intent.getLongExtra("timeTaken", -1);
-
-        Log.d("newIntentInfo", "From previous page: "+name+" has a timeTaken of "+timeTaken);
-
 
         this.bestTimesDB = openOrCreateDatabase("BestTimesDB", MODE_PRIVATE, null);
 
@@ -55,7 +53,6 @@ public class BestTimesList extends AppCompatActivity {
         this.totalNumTimes = countCr.getInt(countCr.getColumnIndex("timeCount"));
         Log.d("LOL", "This is how many things are in TimeList: "+totalNumTimes);
 
-
         if (name != "" && timeTaken != -1) {
             this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
 
@@ -67,23 +64,19 @@ public class BestTimesList extends AppCompatActivity {
     }
 
 
-    public void prevScoreClick(View view) {
-        if (this.currentOffset == 0) {
-            return;
-        }
-
+    public void prevTimesClick(View view) {
         this.currentOffset--;
 
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
         DisplayNewTimes(cr);
     }
 
-    public void nextScoreClick(View view) {
+    public void nextTimesClick(View view) {
         this.currentOffset++;
 
         // PRETTIFY: Figure out how to determine the end of the pagination and what to do with it
 
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
         DisplayNewTimes(cr);
     }
 
@@ -91,10 +84,12 @@ public class BestTimesList extends AppCompatActivity {
         this.bestTimesDB.execSQL("DELETE FROM timeList");
 
         this.currentOffset = 0;
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+paginateValue, null);
+        this.totalNumTimes = 0;
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
 
         DisplayNewTimes(cr);
     }
+
 
     private void DisplayNewTimes(Cursor cr) {
         ArrayList<String> times = new ArrayList<String>();
@@ -113,5 +108,15 @@ public class BestTimesList extends AppCompatActivity {
                 this, android.R.layout.simple_list_item_1, times);
 
         highScoreList.setAdapter(highScoreListAdapter);
+
+        EnableOrDisablePagingButtons();
+    }
+
+    private void EnableOrDisablePagingButtons() {
+        Button prevTimesButton = (Button) findViewById(R.id.prevTimesButton);
+        prevTimesButton.setEnabled(this.currentOffset > 0);
+
+        Button nextTimesButton = (Button) findViewById(R.id.nextTimesButton);
+        nextTimesButton.setEnabled((this.currentOffset + 1) * this.paginateValue <= this.totalNumTimes);
     }
 }

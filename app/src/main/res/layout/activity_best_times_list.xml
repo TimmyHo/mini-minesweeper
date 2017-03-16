@@ -26,10 +26,11 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id="@+id/prevTimesButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text="&lt;"
-            android:onClick="prevScoreClick"/>
+            android:onClick="prevTimesClick"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -47,10 +48,11 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/nextTimesButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text="&gt;"
             android:layout_gravity="right"
-            android:onClick="nextScoreClick"/>
+            android:onClick="nextTimesClick"/>
     </LinearLayout>
 </LinearLayout>
