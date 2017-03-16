@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.timmyho.miniminesweeper.model.TimeEntry;
+import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
+
 import java.util.ArrayList;
 
 public class BestTimesList extends AppCompatActivity {
@@ -92,22 +95,23 @@ public class BestTimesList extends AppCompatActivity {
 
 
     private void DisplayNewTimes(Cursor cr) {
-        ArrayList<String> times = new ArrayList<String>();
+        ArrayList<TimeEntry> timeEntries = new ArrayList<TimeEntry>();
         if (cr.moveToFirst()) {
             do {
-                String name = cr.getString(cr.getColumnIndex("name"));
-                int score = cr.getInt(cr.getColumnIndex("timeTaken"));
+                TimeEntry entry = new TimeEntry();
+                entry.name = cr.getString(cr.getColumnIndex("name"));
+                entry.timeTaken = cr.getInt(cr.getColumnIndex("timeTaken"));
 
-                times.add(name+": "+score);
+                timeEntries.add(entry);
             } while (cr.moveToNext());
         }
 
         ListView bestTimesList = (ListView) findViewById(R.id.bestTimesListView);
 
-        ArrayAdapter<String> highScoreListAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, times);
+        TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
+                this, timeEntries, this.paginateValue);
 
-        bestTimesList.setAdapter(highScoreListAdapter);
+        bestTimesList.setAdapter(timeEntryAdapter);
 
         EnableOrDisablePagingButtons();
     }
