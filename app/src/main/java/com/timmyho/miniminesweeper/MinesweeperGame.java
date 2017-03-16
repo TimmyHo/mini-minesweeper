@@ -21,7 +21,7 @@ public class MinesweeperGame extends AppCompatActivity {
     MineGrid myGrid;
     private int numRows = 10;
     private int numCols = 10;
-    private int numMines = 10;
+    private int numMines = 1;
 
     private long maxTime = 999;
 

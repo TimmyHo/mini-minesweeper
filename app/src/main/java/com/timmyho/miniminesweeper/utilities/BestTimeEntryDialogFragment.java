@@ -25,6 +25,9 @@ public class BestTimeEntryDialogFragment extends DialogFragment {
         Bundle data = getArguments();
         final long timeTaken = (data != null) ? data.getLong("timeTaken", 999) : 999;
 
+        // PRETTIFY learn how to do styles/themes? to add in more beauty and customization to
+        // to the dialog
+
         // Use the Builder class for convenient dialog construction
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
@@ -35,9 +38,9 @@ public class BestTimeEntryDialogFragment extends DialogFragment {
         TextView wonTimeText = (TextView) v.findViewById(R.id.wonTimeText);
         wonTimeText.setText(String.valueOf(timeTaken));
 
-        builder.setTitle("Congratulations! You Won!! ")
+        builder.setTitle("You Won!")
                 .setView(v)
-                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Save Time", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(getActivity(), BestTimesList.class);
 
