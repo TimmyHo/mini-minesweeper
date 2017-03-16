@@ -18,8 +18,6 @@ import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.ImageAdapter;
 
 public class MinesweeperGame extends AppCompatActivity {
-
-    // CODE_SMELL? Maybe this needs to be put in a model or a singleton instance
     MineGrid myGrid;
     private int numRows = 10;
     private int numCols = 10;
@@ -36,8 +34,8 @@ public class MinesweeperGame extends AppCompatActivity {
         setContentView(R.layout.activity_minesweeper_game);
 
         myGrid = new MineGrid(numRows, numCols, numMines);
-        initializeMinesweeperUI();
 
+        initializeMinesweeperUI();
         updateMinesweeperGrid();
 
         // This seems a bit weird, because I am keeping two background tasks, one for the game logic
@@ -84,21 +82,17 @@ public class MinesweeperGame extends AppCompatActivity {
         });
     }
 
-
-    public void ResetMinesweeperGameClick(View view) {
-        myGrid = new MineGrid(numRows, numCols, numMines);
-        updateMinesweeperGrid();
-    }
-
     private void updateMinesweeperGrid() {
         Log.d("MineGridInit", myGrid.GetMineGridToString());
 
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
+        // Update the UI
         int colWidth = Resources.getSystem().getDisplayMetrics().widthPixels/numCols;
         ImageAdapter minesweeperUiAdapter = new ImageAdapter(this, myGrid.GetMineGridAsImageIds(), colWidth);
         minesweeperUI.setAdapter(minesweeperUiAdapter);
 
+        // Update ancillary (ie: non-game) elements
         TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
         numMinesText.setText(String.valueOf(this.numMines - myGrid.GetNumFlaggedCells()));
 
@@ -125,15 +119,19 @@ public class MinesweeperGame extends AppCompatActivity {
     private void showTimeEntryDialog() {
         DialogFragment newFragment = new BestTimeEntryDialogFragment();
         Bundle data = new Bundle();
-        data.putLong("timeTaken", this.myGrid.GetTimeTaken());
+        data.putLong("timeTaken", myGrid.GetTimeTaken());
         newFragment.setArguments(data);
 
-        newFragment.show(getFragmentManager(), "highScore");
+        newFragment.show(getFragmentManager(), "bestTimes");
+    }
+
+    public void ResetMinesweeperGameClick(View view) {
+        myGrid = new MineGrid(numRows, numCols, numMines);
+        updateMinesweeperGrid();
     }
 
     public void GoToBestTimesClick(View view) {
-        Intent intent = new Intent(this, HighScoreList.class);
-
+        Intent intent = new Intent(this, BestTimesList.class);
         startActivity(intent);
     }
 }

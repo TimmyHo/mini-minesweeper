@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
         <!-- PROTO_ONLY need to make sure the highscore list is working -->
-        <activity android:name=".HighScoreList">
+        <activity android:name=".BestTimesList">
 
         </activity>
     </application>

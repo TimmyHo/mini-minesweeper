@@ -12,10 +12,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.timmyho.miniminesweeper.HighScoreList;
+import com.timmyho.miniminesweeper.BestTimesList;
 import com.timmyho.miniminesweeper.R;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by timot on 3/16/2017.
@@ -41,7 +39,7 @@ public class BestTimeEntryDialogFragment extends DialogFragment {
                 .setView(v)
                 .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(getActivity(), HighScoreList.class);
+                        Intent intent = new Intent(getActivity(), BestTimesList.class);
 
                         EditText nameEntryText = (EditText) v.findViewById(R.id.nameEntryText);
                         String nameEntry = nameEntryText.getText().toString();
@@ -49,7 +47,6 @@ public class BestTimeEntryDialogFragment extends DialogFragment {
                         intent.putExtra("name", nameEntry);
                         intent.putExtra("timeTaken", timeTaken);
 
-                        Log.d("sending", "sending data: "+nameEntry+", "+timeTaken);
                         startActivity(intent);
                     }
                 })

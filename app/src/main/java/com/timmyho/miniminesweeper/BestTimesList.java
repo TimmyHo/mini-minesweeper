@@ -13,15 +13,15 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class HighScoreList extends AppCompatActivity {
-    private SQLiteDatabase highScoreDB;
+public class BestTimesList extends AppCompatActivity {
+    private SQLiteDatabase bestTimesDB;
     int currentOffset = 0;
     int paginateValue = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_high_score_list);
+        setContentView(R.layout.activity_best_times_list);
 
 
         Intent intent = getIntent();
@@ -31,31 +31,30 @@ public class HighScoreList extends AppCompatActivity {
         Log.d("newIntentInfo", "From previous page: "+name+" has a timeTaken of "+timeTaken);
 
 
-        this.highScoreDB = openOrCreateDatabase("HighScoreDB", MODE_PRIVATE, null);
+        this.bestTimesDB = openOrCreateDatabase("BestTimesDB", MODE_PRIVATE, null);
 
         // PROTO_ONLY this is just so I can fill the table up with random information to
         // ensure it works
-        /*
-        this.highScoreDB.execSQL("drop table if exists scoreList");
-        this.highScoreDB.execSQL("create table if not exists scoreList (" +
+
+        this.bestTimesDB.execSQL("DROP TABLE IF EXISTS timeList");
+        this.bestTimesDB.execSQL("CREATE TABLE IF NOT EXISTS timeList (" +
                 "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
                 "name   VARCHAR(20)              NOT NULL, " +
-                "score  INT                      NOT NULL);");
+                "timeTaken  INT                  NOT NULL);");
 
-        for (int i = 0; i < 30; i++) {
-            this.highScoreDB.execSQL(
-                "INSERT into scoreList (name, score) VALUES (\"Bob\", " + i + ");");
+        for (int i = 0; i < 30; i+=3) {
+            this.bestTimesDB.execSQL(
+                "INSERT INTO timeList (name, timeTaken) VALUES (\"JOJO\", " + i + ");");
         }
-        */
 
         if (name != "" && timeTaken != -1) {
-            this.highScoreDB.execSQL(String.format("INSERT INTO scoreList (name, score) VALUES (\"%s\", %d);", name, timeTaken));
+            this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
 
             Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken, Toast.LENGTH_SHORT).show();
         }
-        Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+paginateValue, null);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+paginateValue, null);
 
-        DisplayNewScores(cr);
+        DisplayNewTimes(cr);
     }
 
 
@@ -66,8 +65,8 @@ public class HighScoreList extends AppCompatActivity {
 
         this.currentOffset--;
 
-        Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
-        DisplayNewScores(cr);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
+        DisplayNewTimes(cr);
     }
 
     public void nextScoreClick(View view) {
@@ -75,27 +74,25 @@ public class HighScoreList extends AppCompatActivity {
 
         // PRETTIFY: Figure out how to determine the end of the pagination and what to do with it
 
-        Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
-        DisplayNewScores(cr);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
+        DisplayNewTimes(cr);
     }
 
-    private void DisplayNewScores(Cursor cr) {
-        ArrayList<String> scores = new ArrayList<String>();
+    private void DisplayNewTimes(Cursor cr) {
+        ArrayList<String> times = new ArrayList<String>();
         if (cr.moveToFirst()) {
             do {
                 String name = cr.getString(cr.getColumnIndex("name"));
-                int score = cr.getInt(cr.getColumnIndex("score"));
+                int score = cr.getInt(cr.getColumnIndex("timeTaken"));
 
-                Log.d("WriteDB", name+": "+score);
-
-                scores.add(name+": "+score);
+                times.add(name+": "+score);
             } while (cr.moveToNext());
         }
 
         ListView highScoreList = (ListView) findViewById(R.id.highScoreListView);
 
         ArrayAdapter<String> highScoreListAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, scores);
+                this, android.R.layout.simple_list_item_1, times);
 
         highScoreList.setAdapter(highScoreListAdapter);
     }
