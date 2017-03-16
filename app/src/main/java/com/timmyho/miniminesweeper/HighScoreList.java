@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -25,9 +26,9 @@ public class HighScoreList extends AppCompatActivity {
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
-        int score = intent.getIntExtra("score", -1);
+        long timeTaken = intent.getLongExtra("timeTaken", -1);
 
-        Log.d("newIntentInfo", "From previous page: "+name+" has a score of "+score);
+        Log.d("newIntentInfo", "From previous page: "+name+" has a timeTaken of "+timeTaken);
 
 
         this.highScoreDB = openOrCreateDatabase("HighScoreDB", MODE_PRIVATE, null);
@@ -47,8 +48,11 @@ public class HighScoreList extends AppCompatActivity {
         }
         */
 
-        this.highScoreDB.execSQL(String.format("INSERT INTO scoreList (name, score) VALUES (\"%s\", %d);", name, score));
+        if (name != "" && timeTaken != -1) {
+            this.highScoreDB.execSQL(String.format("INSERT INTO scoreList (name, score) VALUES (\"%s\", %d);", name, timeTaken));
 
+            Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken, Toast.LENGTH_SHORT).show();
+        }
         Cursor cr = this.highScoreDB.rawQuery("SELECT name, score from scoreList ORDER BY score DESC LIMIT "+paginateValue, null);
 
         DisplayNewScores(cr);

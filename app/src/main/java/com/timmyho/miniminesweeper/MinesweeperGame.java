@@ -165,6 +165,10 @@ public class MinesweeperGame extends AppCompatActivity {
 
         //startActivity(intent);
         DialogFragment newFragment = new BestTimeEntryDialogFragment();
+        Bundle data = new Bundle();
+        data.putLong("timeTaken", this.myGrid.GetTimeTaken());
+        newFragment.setArguments(data);
+
         newFragment.show(getFragmentManager(), "highScore");
     }
 }

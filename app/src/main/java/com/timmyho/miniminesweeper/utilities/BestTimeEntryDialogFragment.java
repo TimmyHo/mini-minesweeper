@@ -6,10 +6,16 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.HighScoreList;
 import com.timmyho.miniminesweeper.R;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by timot on 3/16/2017.
@@ -18,26 +24,41 @@ import com.timmyho.miniminesweeper.R;
 public class BestTimeEntryDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Bundle data = getArguments();
+        final long timeTaken = (data != null) ? data.getLong("timeTaken", 999) : 999;
+
         // Use the Builder class for convenient dialog construction
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         // CLEANUP "create a string class" and just reference it instead
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle("Congratulations! You Won!!")
-                .setView(inflater.inflate(R.layout.best_time_entry, null))
+        final View v = inflater.inflate(R.layout.best_time_entry, null);
+        TextView wonTimeText = (TextView) v.findViewById(R.id.wonTimeText);
+        wonTimeText.setText(String.valueOf(timeTaken));
+
+        builder.setTitle("Congratulations! You Won!! ")
+                .setView(v)
                 .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(getActivity(), HighScoreList.class);
 
+                        EditText nameEntryText = (EditText) v.findViewById(R.id.nameEntryText);
+                        String nameEntry = nameEntryText.getText().toString();
+
+                        intent.putExtra("name", nameEntry);
+                        intent.putExtra("timeTaken", timeTaken);
+
+                        Log.d("sending", "sending data: "+nameEntry+", "+timeTaken);
                         startActivity(intent);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
+                        dismiss();
                     }
                 });
+
         // Create the AlertDialog object and return it
         return builder.create();
     }
