@@ -15,14 +15,14 @@ import java.util.ArrayList;
 
 public class BestTimesList extends AppCompatActivity {
     private SQLiteDatabase bestTimesDB;
+    int totalNumTimes = 0;
     int currentOffset = 0;
-    int paginateValue = 5;
+    int paginateValue = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_best_times_list);
-
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
@@ -42,10 +42,19 @@ public class BestTimesList extends AppCompatActivity {
                 "name   VARCHAR(20)              NOT NULL, " +
                 "timeTaken  INT                  NOT NULL);");
 
-        for (int i = 0; i < 30; i+=3) {
+        for (int i = 0; i < 50; i+=3) {
             this.bestTimesDB.execSQL(
                 "INSERT INTO timeList (name, timeTaken) VALUES (\"JOJO\", " + i + ");");
         }
+
+        Log.d("LOL", "[BEFORE] This is how many things are in TimeList: "+totalNumTimes);
+
+        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
+        countCr.moveToFirst();
+
+        this.totalNumTimes = countCr.getInt(countCr.getColumnIndex("timeCount"));
+        Log.d("LOL", "This is how many things are in TimeList: "+totalNumTimes);
+
 
         if (name != "" && timeTaken != -1) {
             this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
@@ -75,6 +84,15 @@ public class BestTimesList extends AppCompatActivity {
         // PRETTIFY: Figure out how to determine the end of the pagination and what to do with it
 
         Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
+        DisplayNewTimes(cr);
+    }
+
+    public void clearTimesClick(View view) {
+        this.bestTimesDB.execSQL("DELETE FROM timeList");
+
+        this.currentOffset = 0;
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+paginateValue, null);
+
         DisplayNewTimes(cr);
     }
 
