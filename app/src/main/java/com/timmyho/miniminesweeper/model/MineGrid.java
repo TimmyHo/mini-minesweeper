@@ -1,9 +1,5 @@
 package com.timmyho.miniminesweeper.model;
 
-import android.graphics.Interpolator;
-import android.graphics.Point;
-import android.util.Log;
-
 import com.timmyho.miniminesweeper.R;
 
 import java.util.ArrayList;
@@ -22,12 +18,16 @@ public class MineGrid {
     private int numRows;
     private int numCols;
     private int numMines;
+
+    private int exposedCells;
     private int flaggedCells;
-    private GameState gameState;
 
     private long timeTaken;
     private Timer timer;
     private TimerTask timerTask;
+
+    public enum GameState {NEW_GAME, STARTED, PAUSED, LOST, WON }
+    private GameState gameState;
 
     private static List<Integer> imageIds = Arrays.asList(
             R.drawable.cell0,
@@ -40,18 +40,11 @@ public class MineGrid {
             R.drawable.cell7,
             R.drawable.cell8);
 
-    // techinically a misnomer because one click on a 0 will "expand"
-    // This is meant to talk about the number of uncovered cells
-    // CODE_SMELL? pick a better name
-    private int exposedCells;
-
-    public enum GameState { NEWGAME, STARTED, PAUSED, LOST, WON }
-
     public MineGrid(int rows, int cols, int numMines) {
         this.numRows = rows;
         this.numCols = cols;
         this.numMines = numMines;
-        GenerateMineGrid();
+        generateMineGrid();
 
         this.timer = new Timer();
         this.timerTask = new TimerTask() {
@@ -65,7 +58,7 @@ public class MineGrid {
         timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
 
-    private void GenerateMineGrid() {
+    private void generateMineGrid() {
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
 
         int numRandomMines = 0;
@@ -78,10 +71,10 @@ public class MineGrid {
             this.mineGrid.add(mineRow);
         }
 
-        this.PlaceMines();
+        this.placeMines();
 
-        this.CalculateSurroundingMines();
-        this.gameState = GameState.NEWGAME;
+        this.calculateSurroundingMines();
+        this.gameState = GameState.NEW_GAME;
         this.exposedCells = 0;
         this.flaggedCells = 0;
         this.timeTaken = 0;
@@ -95,15 +88,14 @@ public class MineGrid {
 
     public long GetTimeTaken() { return this.timeTaken; }
 
-    private void PlaceMines() {
-        Random rand = new Random(0);
+    private void placeMines() {
+        Random rand = new Random();
 
         // OPT? The other option (to have it = numMines) is to generate an array of all possible
         // values and then take a random number, add a mine at that index and remove it from the
         // list though this adds more space requirements
         int placedMines = 0;
         while (placedMines < this.numMines) {
-
             int row = rand.nextInt(this.numRows);
             int col = rand.nextInt(this.numCols);
             MineCell cell = mineGrid.get(row).get(col);
@@ -115,216 +107,8 @@ public class MineGrid {
         }
     }
 
-    private void CalculateSurroundingMines() {
-        for (int i = 0; i < this.numRows; i++) {
-            for (int j = 0; j < this.numCols; j++) {
-                this.mineGrid.get(i).get(j).setNumSurroundingMines(CalculateSurroundingMinesForMineCell(i, j));
-            }
-        }
-    }
-
-    private int CalculateSurroundingMinesForMineCell(int row, int col) {
-        int surroundingMines = 0;
-
-        // CODESMELL: feel this could be cleaner Use the dsurrounding thing to create it
-        if (row > 0) {
-            // TOP LEFT
-            if (col > 0) {
-                surroundingMines += this.mineGrid.get(row - 1).get(col - 1).getIsMine() ? 1 : 0;
-            }
-            // TOP RIGHT
-            if (col < this.numCols - 1) {
-                surroundingMines += this.mineGrid.get(row - 1).get(col + 1).getIsMine() ? 1 : 0;
-            }
-            // TOP MIDDLE
-            surroundingMines += this.mineGrid.get(row - 1).get(col).getIsMine() ? 1 : 0;
-        }
-
-        if (row < this.numRows - 1) {
-            // BOTTOM LEFT
-            if (col > 0) {
-                surroundingMines += this.mineGrid.get(row + 1).get(col - 1).getIsMine() ? 1 : 0;
-            }
-            // BOTTOM RIGHT
-            if (col < this.numCols - 1) {
-                surroundingMines += this.mineGrid.get(row + 1).get(col + 1).getIsMine() ? 1 : 0;
-            }
-            // BOTTOM MIDDLE
-            surroundingMines += this.mineGrid.get(row + 1).get(col).getIsMine() ? 1 : 0;
-        }
-
-        // MIDDLE LEFT
-        if (col > 0) {
-            surroundingMines += this.mineGrid.get(row).get(col - 1).getIsMine() ? 1 : 0;
-        }
-        if (col < this.numCols - 1) {
-            surroundingMines += this.mineGrid.get(row).get(col + 1).getIsMine() ? 1 : 0;
-        }
-
-        return surroundingMines;
-    }
-
-    // CODE_SMELL: could possibly override ToString?
-    // CLEANUP Decide if we need these, if we don't then delete, else clean them up
-    // Missing flag and clicked on mine
-    public String GetMineGridToString() {
-        String gridAsString = "";
-        for (int i = 0; i < this.numRows; i++) {
-            for (int j = 0; j < this.numCols; j++) {
-                // CODE_SMELL: could be a place for an enum/string literal
-                String mineChar = "";
-                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
-                    mineChar = "U";
-                }
-                else {
-                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
-                        mineChar = "M";
-                    } else {
-                        mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
-                    }
-                }
-                gridAsString += mineChar+" ";
-            }
-            gridAsString += "\n";
-        }
-        return gridAsString;
-    }
-
-    public List<String> GetMineGridToStringArray() {
-        List<String> mineGridAsStringArray = new ArrayList<String>();
-
-        for (int i = 0; i < this.numRows; i++) {
-            for (int j = 0; j < this.numCols; j++) {
-                // CODE_SMELL: could be a place for an enum/string literal
-                String mineChar = "";
-                if (this.mineGrid.get(i).get(j).getCellState() == MineCell.CellState.UNCLICKED) {
-                    mineChar = "U";
-                }
-                else {
-                    if (this.mineGrid.get(i).get(j).getIsMine() == true) {
-                        mineChar = "M";
-                    } else {
-                        mineChar = this.mineGrid.get(i).get(j).getNumSurroundingMines().toString();
-                    }
-                }
-                mineGridAsStringArray.add(mineChar);
-            }
-        }
-
-        return mineGridAsStringArray;
-    }
-
-    public List<Integer> GetMineGridAsImageIds() {
-        List<Integer> mineGridAsImageIdList = new ArrayList<Integer>();
-
-        for (int i = 0; i < this.numRows; i++) {
-            for (int j = 0; j < this.numCols; j++) {
-                MineCell currentCell = this.mineGrid.get(i).get(j);
-                // CODE_SMELL: could be a place for an enum/string literal
-                Integer cellId = R.drawable.unclicked;
-                if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
-                    cellId = R.drawable.unclicked;
-                }
-                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
-                    cellId = R.drawable.flag;
-                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
-                    cellId = R.drawable.no_mine;
-                } else {
-                    if (currentCell.getIsMine() == true) {
-                        if (currentCell.getCellState() == MineCell.CellState.CLICKED_LOST) {
-                            cellId = R.drawable.mine_clicked;
-                        } else {
-                            cellId = R.drawable.mine;
-                        }
-                    } else {
-                        cellId = MineGrid.imageIds.get(currentCell.getNumSurroundingMines());
-                    }
-                }
-                mineGridAsImageIdList.add(cellId);
-            }
-        }
-
-        return mineGridAsImageIdList;
-    }
-
-    // TODO_POSS maybe return a value for what the result of clicking this cell is
-    public void ClickMineCell(int i, int j) {
-        // Error Checking to make sure there is a valid item;
-        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
-            return;
-        }
-
-        // Don't want the user to die on the initial click
-        if (this.gameState == GameState.NEWGAME) {
-            while (this.mineGrid.get(i).get(j).getIsMine()) {
-                GenerateMineGrid();
-            }
-
-            this.gameState = GameState.STARTED;
-        }
-
-        if (this.gameState == GameState.STARTED) {
-            // Now check the cell itself
-            MineCell clickedCell = this.mineGrid.get(i).get(j);
-            if (clickedCell.getCellState() == MineCell.CellState.UNCLICKED) {
-                if (clickedCell.getIsMine()) {
-                    clickedCell.setCellState(MineCell.CellState.CLICKED_LOST);
-                    ShowMines();
-
-                    this.gameState = GameState.LOST;
-                }
-                else {
-                    if (clickedCell.getNumSurroundingMines() == 0) {
-                        ExpandExposedCells(i, j);
-                    } else {
-                        clickedCell.setCellState(MineCell.CellState.CLICKED);
-                        this.exposedCells++;
-                    }
-
-                    if (this.numRows * this.numCols - this.numMines == this.exposedCells) {
-                        ShowMines();
-                        this.gameState = GameState.WON;
-                    }
-                }
-            }
-        }
-    }
-
-    public void FlagMineCell(int i, int j) {
-        // Error Checking to make sure there is a valid item;
-        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
-            return;
-        }
-
-        MineCell selectedCell = this.mineGrid.get(i).get(j);
-
-        if (selectedCell.getCellState() == MineCell.CellState.FLAGGED) {
-            selectedCell.setCellState(MineCell.CellState.UNCLICKED);
-            this.flaggedCells--;
-        } else if (selectedCell.getCellState() == MineCell.CellState.UNCLICKED) {
-            selectedCell.setCellState(MineCell.CellState.FLAGGED);
-            this.flaggedCells++;
-        }
-    }
-
-    private void ShowMines() {
-        for (int i = 0; i < this.numRows; i++) {
-            for (int j = 0; j < this.numCols; j++) {
-                MineCell cell = this.mineGrid.get(i).get(j);
-
-                if (cell.getIsMine() && cell.getCellState() == MineCell.CellState.UNCLICKED) {
-                    cell.setCellState(MineCell.CellState.CLICKED);
-                }
-
-                if (cell.getCellState() == MineCell.CellState.FLAGGED && !cell.getIsMine()) {
-                    cell.setCellState(MineCell.CellState.FLAGGED_WRONG);
-                }
-            }
-        }
-    }
-
-    private List<GridIndex> GetSurroundingCells(int row, int col) {
-       List<GridIndex> surroundingCellIndexList = new ArrayList<GridIndex>();
+    private List<GridIndex> getSurroundingCells(int row, int col) {
+        List<GridIndex> surroundingCellIndexList = new ArrayList<GridIndex>();
 
         // CODESMELL: feel this could be cleaner, not sre if I really need a GridIndex
         if (row > 0) {
@@ -364,14 +148,77 @@ public class MineGrid {
         return surroundingCellIndexList;
     }
 
-    // Add
-    private void ExpandExposedCells(int row, int col) {
+    private void calculateSurroundingMines() {
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                this.mineGrid.get(i).get(j).setNumSurroundingMines(calculateSurroundingMinesForMineCell(i, j));
+            }
+        }
+    }
+
+    private int calculateSurroundingMinesForMineCell(int row, int col) {
+        int surroundingMines = 0;
+
+        List<GridIndex> surroundingCells = getSurroundingCells(row, col);
+
+        for (int i = 0; i < surroundingCells.size(); i++) {
+            MineCell checkCell = this.mineGrid.get(surroundingCells.get(i).row).get(surroundingCells.get(i).col);
+
+            surroundingMines += checkCell.getIsMine() ? 1 : 0;
+        }
+
+        return surroundingMines;
+    }
+    // TODO_POSS maybe return a value for what the result of clicking this cell is
+    public void ClickMineCell(int i, int j) {
+        // Error Checking to make sure there is a valid item;
+        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
+            return;
+        }
+
+        // Don't want the user to die on the initial click
+        if (this.gameState == GameState.NEW_GAME) {
+            while (this.mineGrid.get(i).get(j).getIsMine()) {
+                generateMineGrid();
+            }
+
+            this.gameState = GameState.STARTED;
+        }
+
+        if (this.gameState == GameState.STARTED) {
+            // Now check the cell itself
+            MineCell clickedCell = this.mineGrid.get(i).get(j);
+            if (clickedCell.getCellState() == MineCell.CellState.UNCLICKED) {
+                if (clickedCell.getIsMine()) {
+                    clickedCell.setCellState(MineCell.CellState.CLICKED_LOST);
+
+                    this.gameState = GameState.LOST;
+                    showMinesAfterGameOver();
+                }
+                else {
+                    if (clickedCell.getNumSurroundingMines() == 0) {
+                        expandExposedCells(i, j);
+                    } else {
+                        clickedCell.setCellState(MineCell.CellState.CLICKED);
+                        this.exposedCells++;
+                    }
+
+                    if (this.numRows * this.numCols - this.numMines == this.exposedCells) {
+                        this.gameState = GameState.WON;
+                        showMinesAfterGameOver();
+                    }
+                }
+            }
+        }
+    }
+
+    private void expandExposedCells(int row, int col) {
         List<GridIndex> checkCandidates = new ArrayList<GridIndex>();
 
         checkCandidates.add(new GridIndex(row, col));
 
         while (checkCandidates.size() > 0) {
-            List<GridIndex> surroundingCells = GetSurroundingCells(checkCandidates.get(0).row, checkCandidates.get(0).col);
+            List<GridIndex> surroundingCells = getSurroundingCells(checkCandidates.get(0).row, checkCandidates.get(0).col);
             for (int i = 0; i < surroundingCells.size(); i++) {
                 MineCell checkCell = this.mineGrid.get(surroundingCells.get(i).row).get(surroundingCells.get(i).col);
 
@@ -389,5 +236,114 @@ public class MineGrid {
             // A 0th one in the second loop (already added
             checkCandidates.remove(0);
         }
+    }
+
+    private void showMinesAfterGameOver() {
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                MineCell cell = this.mineGrid.get(i).get(j);
+
+                if (cell.getIsMine() && cell.getCellState() == MineCell.CellState.UNCLICKED) {
+                    if (gameState == GameState.LOST) {
+                        cell.setCellState(MineCell.CellState.CLICKED);
+                    } else {
+                        cell.setCellState(MineCell.CellState.FLAGGED);
+                    }
+                }
+                if (cell.getCellState() == MineCell.CellState.FLAGGED && !cell.getIsMine()) {
+                    cell.setCellState(MineCell.CellState.FLAGGED_WRONG);
+                }
+            }
+        }
+    }
+
+    public void FlagMineCell(int i, int j) {
+        // Error Checking to make sure there is a valid item;
+        if (i < 0 || i >= this.numRows || j < 0 || j >= this.numCols) {
+            return;
+        }
+
+        MineCell selectedCell = this.mineGrid.get(i).get(j);
+
+        if (selectedCell.getCellState() == MineCell.CellState.FLAGGED) {
+            selectedCell.setCellState(MineCell.CellState.UNCLICKED);
+            this.flaggedCells--;
+        } else if (selectedCell.getCellState() == MineCell.CellState.UNCLICKED) {
+            selectedCell.setCellState(MineCell.CellState.FLAGGED);
+            this.flaggedCells++;
+        }
+    }
+
+    // CODE_SMELL: could possibly override ToString?
+    // CLEANUP Decide if we need these, if we don't then delete, else clean them up
+    // Missing flag and clicked on mine
+    public String GetMineGridToString() {
+        String gridAsString = "";
+
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                MineCell currentCell = this.mineGrid.get(i).get(j);
+                // CODE_SMELL: could be a place for an enum/string literal or
+                // a mapping between string rep and image_id rep.
+                // However this is for mostly diagnostics purposes so I've chosen to get to this
+                // later (if warrented)
+                String cellChar = "U";
+                if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
+                    cellChar = "U";
+                }
+                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
+                    cellChar = "F";
+                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
+                    cellChar = "N";
+                } else {
+                    if (currentCell.getIsMine() == true) {
+                        if (currentCell.getCellState() == MineCell.CellState.CLICKED_LOST) {
+                            cellChar = "X";
+                        } else {
+                            cellChar = "M";
+                        }
+                    } else {
+                        cellChar = currentCell.getNumSurroundingMines().toString();
+                    }
+                }
+                gridAsString += cellChar + " ";
+            }
+            gridAsString += "\n";
+        }
+
+        return gridAsString;
+    }
+
+    public List<Integer> GetMineGridAsImageIds() {
+        List<Integer> mineGridAsImageIdList = new ArrayList<Integer>();
+
+        for (int i = 0; i < this.numRows; i++) {
+            for (int j = 0; j < this.numCols; j++) {
+                MineCell currentCell = this.mineGrid.get(i).get(j);
+                // CODE_SMELL: could be a place for an enum/string literal
+                Integer cellId = R.drawable.unclicked;
+                if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
+                    cellId = R.drawable.unclicked;
+                }
+                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
+                    cellId = R.drawable.flag;
+                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
+                    cellId = R.drawable.no_mine;
+                } else {
+                    if (currentCell.getIsMine() == true) {
+                        if (currentCell.getCellState() == MineCell.CellState.CLICKED_LOST) {
+                            cellId = R.drawable.mine_clicked;
+                        } else {
+                            cellId = R.drawable.mine;
+                        }
+                    } else {
+                        cellId = MineGrid.imageIds.get(currentCell.getNumSurroundingMines());
+                    }
+                }
+                mineGridAsImageIdList.add(cellId);
+            }
+        }
+
+        return mineGridAsImageIdList;
     }
 }

@@ -103,10 +103,10 @@ public class MinesweeperGame extends AppCompatActivity {
 
         // TODO_CLEANUP: Maybe a class or something (so there's no need for so many if/switch
         // statements
-        if (gameState == MineGrid.GameState.NEWGAME) {
-            gameStateText.setTextColor(Color.BLACK);
+        if (gameState == MineGrid.GameState.NEW_GAME) {
+            gameStateText.setTextColor(Color.LTGRAY);
         } else if (gameState == MineGrid.GameState.STARTED){
-            gameStateText.setTextColor(Color.DKGRAY);
+            gameStateText.setTextColor(Color.BLACK);
         } else if (gameState == MineGrid.GameState.WON){
             gameStateText.setTextColor(Color.GREEN);
 
