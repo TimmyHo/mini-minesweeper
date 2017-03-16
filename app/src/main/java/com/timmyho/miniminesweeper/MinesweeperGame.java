@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
-import com.timmyho.miniminesweeper.utilities.HighScoreEntryDialogFragment;
+import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.ImageAdapter;
 
 import org.w3c.dom.Text;
@@ -164,7 +164,7 @@ public class MinesweeperGame extends AppCompatActivity {
         intent.putExtra("score", 420);
 
         //startActivity(intent);
-        DialogFragment newFragment = new HighScoreEntryDialogFragment();
+        DialogFragment newFragment = new BestTimeEntryDialogFragment();
         newFragment.show(getFragmentManager(), "highScore");
     }
 }
