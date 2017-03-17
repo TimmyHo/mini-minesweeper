@@ -1,6 +1,8 @@
 package com.timmyho.miniminesweeper;
 
+import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.timmyho.miniminesweeper.model.TimeEntry;
+import com.timmyho.miniminesweeper.utilities.ClearTimesDialogFragment;
 import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
 
 import java.util.ArrayList;
@@ -40,6 +43,10 @@ public class BestTimesList extends AppCompatActivity {
                 "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
                 "name   VARCHAR(20)              NOT NULL, " +
                 "timeTaken  INT                  NOT NULL);");
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            this.pageSize = 5;
+        }
 
         readInMockData();
 
@@ -88,7 +95,6 @@ public class BestTimesList extends AppCompatActivity {
         }
     }
 
-
     private void addMockData() {
         for (int i = 0; i < mockDataEntries.size(); i++) {
             this.bestTimesDB.execSQL(String.format(
@@ -98,6 +104,16 @@ public class BestTimesList extends AppCompatActivity {
         }
 
         setNumTimeEntries();
+        displayNewTimes();
+    }
+
+    // ARCHITECT Should ClearTimesDialogFragment be a class so this is a private?
+    public void ClearTimes() {
+        this.bestTimesDB.execSQL("DELETE FROM timeList");
+
+        this.currentOffset = 0;
+        this.totalNumTimeEntries = 0;
+
         displayNewTimes();
     }
 
@@ -146,11 +162,8 @@ public class BestTimesList extends AppCompatActivity {
     }
 
     public void ClearTimesClick(View view) {
-        this.bestTimesDB.execSQL("DELETE FROM timeList");
+        DialogFragment newFragment = new ClearTimesDialogFragment();
 
-        this.currentOffset = 0;
-        this.totalNumTimeEntries = 0;
-
-        displayNewTimes();
+        newFragment.show(getFragmentManager(), "clearTimes");
     }
 }
