@@ -61,7 +61,7 @@ public class BestTimesList extends AppCompatActivity {
 
             Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken, Toast.LENGTH_SHORT).show();
         }
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken DESC LIMIT "+paginateValue, null);
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
 
         DisplayNewTimes(cr);
     }
@@ -109,7 +109,7 @@ public class BestTimesList extends AppCompatActivity {
         ListView bestTimesList = (ListView) findViewById(R.id.bestTimesListView);
 
         TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
-                this, timeEntries, this.paginateValue);
+                this, timeEntries, this.currentOffset, this.paginateValue);
 
         bestTimesList.setAdapter(timeEntryAdapter);
 

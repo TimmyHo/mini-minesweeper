@@ -5,17 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.timmyho.miniminesweeper.BestTimesList">
-
-
+    tools:context="com.timmyho.miniminesweeper.BestTimesList"
+    >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+    android:padding="2dp"
         android:gravity="center"
-        android:text="High Score"
-        />
+        android:text="Best Times"
+        android:textSize="12pt"/>
 
     <ListView
         android:layout_width="match_parent"
@@ -23,7 +22,10 @@
         android:id="@+id/bestTimesListView"></ListView>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_weight="1"
+        android:padding="2dp">
 
         <Button
             android:id="@+id/prevTimesButton"
@@ -52,7 +54,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text="&gt;"
-            android:layout_gravity="right"
+            android:layout_gravity="bottom|right"
             android:onClick="nextTimesClick"/>
     </LinearLayout>
 </LinearLayout>

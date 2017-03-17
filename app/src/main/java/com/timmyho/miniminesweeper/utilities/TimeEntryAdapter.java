@@ -1,11 +1,13 @@
 package com.timmyho.miniminesweeper.utilities;
 
 import android.content.Context;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.R;
@@ -13,6 +15,7 @@ import com.timmyho.miniminesweeper.model.TimeEntry;
 
 import org.w3c.dom.Text;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,11 +25,13 @@ import java.util.List;
 public class TimeEntryAdapter extends BaseAdapter {
     private Context mContext;
     List<TimeEntry> entries;
+    int currentOffset;
     int pageSize;
 
-    public TimeEntryAdapter(Context c, List<TimeEntry> entries, int pageSize) {
+    public TimeEntryAdapter(Context c, List<TimeEntry> entries,  int currentOffset, int pageSize) {
         mContext = c;
         this.entries = entries;
+        this.currentOffset = currentOffset;
         this.pageSize = pageSize;
     }
 
@@ -43,10 +48,19 @@ public class TimeEntryAdapter extends BaseAdapter {
 
     }
 
+    private List<Integer> medalImages = Arrays.asList(R.drawable.medal_1st, R.drawable.medal_2nd, R.drawable.medal_3rd);
+
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflater.inflate(R.layout.time_entry_item, null);
+
+        if (this.currentOffset*this.pageSize + position < medalImages.size()) {
+            ImageView medalPlaceImage = (ImageView) v.findViewById(R.id.medalPlaceImage);
+
+            medalPlaceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            medalPlaceImage.setImageResource(medalImages.get(position));
+        }
 
         if (position < this.entries.size()) {
             Log.d("position", "position is: "+position+ ": "+this.entries.get(position).name+", "+this.entries.get(position).timeTaken.toString());
