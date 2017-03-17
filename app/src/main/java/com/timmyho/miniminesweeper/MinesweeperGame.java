@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
@@ -22,6 +23,7 @@ public class MinesweeperGame extends AppCompatActivity {
     private int numRows = 10;
     private int numCols = 10;
     private int numMines = 10;
+    private int colWidth = 0;
 
     private long maxTime = 999;
 
@@ -73,10 +75,37 @@ public class MinesweeperGame extends AppCompatActivity {
     }
 
     private void initializeMinesweeperUI() {
+        int statusBarHeight = 0;
+        int titleBarHeight = 0;
+
+        int statusBarResourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (statusBarResourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(statusBarResourceId);
+        }
+
+        int titleBarResourceId = getResources().getIdentifier("action_bar_default_height", "dimen", "android");
+        if (titleBarResourceId > 0) {
+            titleBarHeight = getResources().getDimensionPixelSize(titleBarResourceId);
+        }
+
+        Log.d("heights", "Status Bar Height: "+statusBarHeight+", Title Bar Height: "+titleBarHeight);
+
+        // Update the UI
+        int height = Resources.getSystem().getDisplayMetrics().heightPixels - statusBarHeight - titleBarHeight;
+
+        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+
+        Log.d("heights", "w, h => "+width+", "+height);
+        int shortestDim = Math.min(height, width);
+
+        this.colWidth = shortestDim/numCols;
+
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
         minesweeperUI.setNumColumns(this.numCols);
-        minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
+        minesweeperUI.setStretchMode(GridView.NO_STRETCH);
+//        minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
+        minesweeperUI.setColumnWidth(colWidth);
 
         minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -109,9 +138,7 @@ public class MinesweeperGame extends AppCompatActivity {
 
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
-        // Update the UI
-        int colWidth = Resources.getSystem().getDisplayMetrics().widthPixels/numCols;
-        MineCellAsImageAdapter minesweeperUiAdapter = new MineCellAsImageAdapter(this, myGrid.GetMineGridAsImageIds(), colWidth);
+        MineCellAsImageAdapter minesweeperUiAdapter = new MineCellAsImageAdapter(this, myGrid.GetMineGridAsImageIds(), this.colWidth);
         minesweeperUI.setAdapter(minesweeperUiAdapter);
 
         // Update ancillary (ie: non-game) elements
