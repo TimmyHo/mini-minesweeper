@@ -59,7 +59,7 @@ public class BestTimesList extends AppCompatActivity {
         if (name != "" && timeTaken != -1) {
             this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
 
-            Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken+ "  to Best Times!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken+ " to Best Times!", Toast.LENGTH_SHORT).show();
         }
         Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
 

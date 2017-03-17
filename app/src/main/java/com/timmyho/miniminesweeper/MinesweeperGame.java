@@ -21,7 +21,7 @@ public class MinesweeperGame extends AppCompatActivity {
     MineGrid myGrid;
     private int numRows = 10;
     private int numCols = 10;
-    private int numMines = 1;
+    private int numMines = 10;
 
     private long maxTime = 999;
 
@@ -56,6 +56,20 @@ public class MinesweeperGame extends AppCompatActivity {
 
         };
         timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        myGrid.PauseGame();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myGrid.ResumeGame();
     }
 
     private void initializeMinesweeperUI() {

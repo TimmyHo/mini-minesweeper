@@ -169,6 +169,7 @@ public class MineGrid {
 
         return surroundingMines;
     }
+
     // TODO_POSS maybe return a value for what the result of clicking this cell is
     public void ClickMineCell(int i, int j) {
         // Error Checking to make sure there is a valid item;
@@ -345,5 +346,17 @@ public class MineGrid {
         }
 
         return mineGridAsImageIdList;
+    }
+
+    public void PauseGame() {
+        if (this.gameState == GameState.STARTED) {
+            this.gameState = GameState.PAUSED;
+        }
+    }
+
+    public void ResumeGame() {
+        if (this.gameState == GameState.PAUSED) {
+            this.gameState = GameState.STARTED;
+        }
     }
 }
