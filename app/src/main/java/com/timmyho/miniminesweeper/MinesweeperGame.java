@@ -67,16 +67,24 @@ public class MinesweeperGame extends AppCompatActivity {
         minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                myGrid.ClickMineCell(position / numCols, position % numCols);
-                updateMinesweeperGrid();
+                if (myGrid.GetGameState() == MineGrid.GameState.NEW_GAME ||
+                    myGrid.GetGameState() == MineGrid.GameState.STARTED) {
+
+                    myGrid.ClickMineCell(position / numCols, position % numCols);
+                    updateMinesweeperGrid();
+                }
                 }
         });
 
         minesweeperUI.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                myGrid.FlagMineCell(position / numCols, position % numCols);
-                updateMinesweeperGrid();
+                if (myGrid.GetGameState() == MineGrid.GameState.NEW_GAME ||
+                    myGrid.GetGameState() == MineGrid.GameState.STARTED) {
+
+                    myGrid.FlagMineCell(position / numCols, position % numCols);
+                    updateMinesweeperGrid();
+                }
                 return true;
             }
         });

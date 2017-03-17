@@ -196,11 +196,11 @@ public class MineGrid {
                     showMinesAfterGameOver();
                 }
                 else {
+
+                    clickedCell.setCellState(MineCell.CellState.CLICKED);
+                    this.exposedCells++;
                     if (clickedCell.getNumSurroundingMines() == 0) {
                         expandExposedCells(i, j);
-                    } else {
-                        clickedCell.setCellState(MineCell.CellState.CLICKED);
-                        this.exposedCells++;
                     }
 
                     if (this.numRows * this.numCols - this.numMines == this.exposedCells) {
