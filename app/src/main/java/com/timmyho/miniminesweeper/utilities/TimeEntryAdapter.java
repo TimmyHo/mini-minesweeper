@@ -44,6 +44,11 @@ public class TimeEntryAdapter extends BaseAdapter {
     }
 
     public int getCount() {
+        // In the case that there are 0 entries, still want to show a similar UI
+        if (this.entries.size() == 0) {
+            return this.pageSize;
+        }
+
         return (int) (Math.ceil(this.entries.size() / (double)pageSize)*pageSize);
 
     }
@@ -55,14 +60,14 @@ public class TimeEntryAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflater.inflate(R.layout.time_entry_item, null);
 
-        if (this.currentOffset*this.pageSize + position < medalImages.size()) {
-            ImageView medalPlaceImage = (ImageView) v.findViewById(R.id.medalPlaceImage);
-
-            medalPlaceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            medalPlaceImage.setImageResource(medalImages.get(position));
-        }
-
         if (position < this.entries.size()) {
+            if (this.currentOffset*this.pageSize + position < medalImages.size()) {
+                ImageView medalPlaceImage = (ImageView) v.findViewById(R.id.medalPlaceImage);
+
+                medalPlaceImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                medalPlaceImage.setImageResource(medalImages.get(position));
+            }
+
             Log.d("position", "position is: "+position+ ": "+this.entries.get(position).name+", "+this.entries.get(position).timeTaken.toString());
 
             TextView nameForTimeEntry = (TextView) v.findViewById(R.id.nameForTimeEntry);
