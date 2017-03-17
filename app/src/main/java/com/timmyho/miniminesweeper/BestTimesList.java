@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,12 +15,16 @@ import com.timmyho.miniminesweeper.model.TimeEntry;
 import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class BestTimesList extends AppCompatActivity {
     private SQLiteDatabase bestTimesDB;
     int totalNumTimes = 0;
     int currentOffset = 0;
     int paginateValue = 10;
+
+    List<TimeEntry> mockDataEntries = new ArrayList<TimeEntry>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,19 +37,21 @@ public class BestTimesList extends AppCompatActivity {
 
         this.bestTimesDB = openOrCreateDatabase("BestTimesDB", MODE_PRIVATE, null);
 
-        // PROTO_ONLY this is just so I can fill the table up with random information to
-        // ensure it works
-
-        this.bestTimesDB.execSQL("DROP TABLE IF EXISTS timeList");
         this.bestTimesDB.execSQL("CREATE TABLE IF NOT EXISTS timeList (" +
                 "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
                 "name   VARCHAR(20)              NOT NULL, " +
                 "timeTaken  INT                  NOT NULL);");
 
-        for (int i = 0; i < 50; i+=3) {
-            this.bestTimesDB.execSQL(
-                "INSERT INTO timeList (name, timeTaken) VALUES (\"JOJO\", " + i + ");");
-        }
+        Button clearTimesButton = (Button) findViewById(R.id.clearTimesButton);
+
+        clearTimesButton.setOnLongClickListener(new Button.OnLongClickListener() {
+            public boolean onLongClick(View v) {
+                addMockData();
+                return true;
+            }
+        });
+
+readInMockData();
 
         Log.d("LOL", "[BEFORE] This is how many things are in TimeList: "+totalNumTimes);
 
@@ -66,6 +71,40 @@ public class BestTimesList extends AppCompatActivity {
         DisplayNewTimes(cr);
     }
 
+    private void readInMockData() {
+        Scanner scanner = new Scanner(getResources().openRawResource(R.raw.mock_data));
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] parts = line.split("\t");
+
+            if (parts.length == 2) {
+                TimeEntry timeEntry = new TimeEntry();
+                timeEntry.name = parts[0];
+                timeEntry.timeTaken = Integer.parseInt(parts[1]);
+
+                this.mockDataEntries.add(timeEntry);
+            }
+        }
+    }
+
+    private void addMockData() {
+        for (int i = 0; i < mockDataEntries.size(); i++) {
+            this.bestTimesDB.execSQL(String.format(
+                    "INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d)",
+                    this.mockDataEntries.get(i).name,
+                    this.mockDataEntries.get(i).timeTaken));
+        }
+
+        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
+        countCr.moveToFirst();
+
+        this.totalNumTimes = countCr.getInt(countCr.getColumnIndex("timeCount"));
+
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
+
+        DisplayNewTimes(cr);
+    }
 
     public void prevTimesClick(View view) {
         this.currentOffset--;

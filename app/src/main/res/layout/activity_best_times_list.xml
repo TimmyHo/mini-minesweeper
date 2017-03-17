@@ -45,6 +45,7 @@
 
                 android:text="Clear Times"
                 android:onClick="clearTimesClick"
+                android:id="@+id/clearTimesButton"
                 />
 
         </LinearLayout>

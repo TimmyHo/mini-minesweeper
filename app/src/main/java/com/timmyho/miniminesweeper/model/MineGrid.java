@@ -291,10 +291,9 @@ public class MineGrid {
                 String cellChar = "U";
                 if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
                     cellChar = "U";
-                }
-                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
+                } else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
                     cellChar = "F";
-                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
+                } else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
                     cellChar = "N";
                 } else {
                     if (currentCell.getIsMine() == true) {
@@ -325,10 +324,9 @@ public class MineGrid {
                 Integer cellId = R.drawable.unclicked;
                 if (currentCell.getCellState() == MineCell.CellState.UNCLICKED) {
                     cellId = R.drawable.unclicked;
-                }
-                else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
+                } else if (currentCell.getCellState() == MineCell.CellState.FLAGGED) {
                     cellId = R.drawable.flag;
-                }else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
+                } else if (currentCell.getCellState() == MineCell.CellState.FLAGGED_WRONG) {
                     cellId = R.drawable.no_mine;
                 } else {
                     if (currentCell.getIsMine() == true) {
