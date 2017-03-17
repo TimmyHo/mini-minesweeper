@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -20,11 +19,11 @@ import java.util.Scanner;
 
 public class BestTimesList extends AppCompatActivity {
     private SQLiteDatabase bestTimesDB;
-    int totalNumTimes = 0;
-    int currentOffset = 0;
-    int paginateValue = 10;
+    private int totalNumTimeEntries = 0;
+    private int currentOffset = 0;
+    private int pageSize = 10;
 
-    List<TimeEntry> mockDataEntries = new ArrayList<TimeEntry>();
+    private List<TimeEntry> mockDataEntries = new ArrayList<TimeEntry>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +41,9 @@ public class BestTimesList extends AppCompatActivity {
                 "name   VARCHAR(20)              NOT NULL, " +
                 "timeTaken  INT                  NOT NULL);");
 
+        readInMockData();
+
+        // Add the hold listener to the "clear times" button to add mock data
         Button clearTimesButton = (Button) findViewById(R.id.clearTimesButton);
 
         clearTimesButton.setOnLongClickListener(new Button.OnLongClickListener() {
@@ -51,24 +53,22 @@ public class BestTimesList extends AppCompatActivity {
             }
         });
 
-readInMockData();
-
-        Log.d("LOL", "[BEFORE] This is how many things are in TimeList: "+totalNumTimes);
-
-        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
-        countCr.moveToFirst();
-
-        this.totalNumTimes = countCr.getInt(countCr.getColumnIndex("timeCount"));
-        Log.d("LOL", "This is how many things are in TimeList: "+totalNumTimes);
-
         if (name != "" && timeTaken != -1) {
             this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
 
-            Toast.makeText(this.getBaseContext(), "Added "+name+": "+timeTaken+ " to Best Times!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getBaseContext(), name+": "+timeTaken+" added to \"Best Times\"", Toast.LENGTH_SHORT).show();
         }
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
 
-        DisplayNewTimes(cr);
+        setNumTimeEntries();
+        displayNewTimes();
+    }
+
+
+    private void setNumTimeEntries() {
+        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
+        countCr.moveToFirst();
+
+        this.totalNumTimeEntries = countCr.getInt(countCr.getColumnIndex("timeCount"));
     }
 
     private void readInMockData() {
@@ -88,6 +88,7 @@ readInMockData();
         }
     }
 
+
     private void addMockData() {
         for (int i = 0; i < mockDataEntries.size(); i++) {
             this.bestTimesDB.execSQL(String.format(
@@ -96,45 +97,14 @@ readInMockData();
                     this.mockDataEntries.get(i).timeTaken));
         }
 
-        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
-        countCr.moveToFirst();
-
-        this.totalNumTimes = countCr.getInt(countCr.getColumnIndex("timeCount"));
-
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
-
-        DisplayNewTimes(cr);
+        setNumTimeEntries();
+        displayNewTimes();
     }
 
-    public void prevTimesClick(View view) {
-        this.currentOffset--;
-
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
-        DisplayNewTimes(cr);
-    }
-
-    public void nextTimesClick(View view) {
-        this.currentOffset++;
-
-        // PRETTIFY: Figure out how to determine the end of the pagination and what to do with it
-
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset*paginateValue+", "+paginateValue, null);
-        DisplayNewTimes(cr);
-    }
-
-    public void clearTimesClick(View view) {
-        this.bestTimesDB.execSQL("DELETE FROM timeList");
-
-        this.currentOffset = 0;
-        this.totalNumTimes = 0;
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+paginateValue, null);
-
-        DisplayNewTimes(cr);
-    }
-
-
-    private void DisplayNewTimes(Cursor cr) {
+    private void displayNewTimes() {
         ArrayList<TimeEntry> timeEntries = new ArrayList<TimeEntry>();
+
+        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset* pageSize +", "+ pageSize, null);
         if (cr.moveToFirst()) {
             do {
                 TimeEntry entry = new TimeEntry();
@@ -148,18 +118,39 @@ readInMockData();
         ListView bestTimesList = (ListView) findViewById(R.id.bestTimesListView);
 
         TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
-                this, timeEntries, this.currentOffset, this.paginateValue);
+                this, timeEntries, this.currentOffset, this.pageSize);
 
         bestTimesList.setAdapter(timeEntryAdapter);
 
-        EnableOrDisablePagingButtons();
+        enableOrDisablePagingButtons();
     }
 
-    private void EnableOrDisablePagingButtons() {
+    private void enableOrDisablePagingButtons() {
         Button prevTimesButton = (Button) findViewById(R.id.prevTimesButton);
         prevTimesButton.setEnabled(this.currentOffset > 0);
 
         Button nextTimesButton = (Button) findViewById(R.id.nextTimesButton);
-        nextTimesButton.setEnabled((this.currentOffset + 1) * this.paginateValue <= this.totalNumTimes);
+        nextTimesButton.setEnabled((this.currentOffset + 1) * this.pageSize <= this.totalNumTimeEntries);
+    }
+
+    public void PrevTimesClick(View view) {
+        this.currentOffset--;
+
+        displayNewTimes();
+    }
+
+    public void NextTimesClick(View view) {
+        this.currentOffset++;
+
+        displayNewTimes();
+    }
+
+    public void ClearTimesClick(View view) {
+        this.bestTimesDB.execSQL("DELETE FROM timeList");
+
+        this.currentOffset = 0;
+        this.totalNumTimeEntries = 0;
+
+        displayNewTimes();
     }
 }

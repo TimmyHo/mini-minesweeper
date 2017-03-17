@@ -18,15 +18,15 @@ import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.MineCellAsImageAdapter;
 
 public class MinesweeperGame extends AppCompatActivity {
-    MineGrid myGrid;
+    private MineGrid myGrid;
     private int numRows = 10;
     private int numCols = 10;
     private int numMines = 10;
 
     private long maxTime = 999;
 
-    final Handler timerHandler = new Handler();
-    Runnable timerRunnable;
+    final private Handler timerHandler = new Handler();
+    private Runnable timerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
