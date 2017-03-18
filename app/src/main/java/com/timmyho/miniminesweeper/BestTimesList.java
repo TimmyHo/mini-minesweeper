@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.timmyho.miniminesweeper.model.BestTimesDatabase;
 import com.timmyho.miniminesweeper.model.TimeEntry;
 import com.timmyho.miniminesweeper.utilities.ClearTimesDialogFragment;
 import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
@@ -21,12 +22,10 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BestTimesList extends AppCompatActivity {
-    private SQLiteDatabase bestTimesDB;
+    private BestTimesDatabase bestTimesDB;
     private int totalNumTimeEntries = 0;
     private int currentOffset = 0;
     private int pageSize = 10;
-
-    private List<TimeEntry> mockDataEntries = new ArrayList<TimeEntry>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,32 +36,26 @@ public class BestTimesList extends AppCompatActivity {
         String name = intent.getStringExtra("name");
         long timeTaken = intent.getLongExtra("timeTaken", -1);
 
-        this.bestTimesDB = openOrCreateDatabase("BestTimesDB", MODE_PRIVATE, null);
-
-        this.bestTimesDB.execSQL("CREATE TABLE IF NOT EXISTS timeList (" +
-                "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
-                "name   VARCHAR(20)              NOT NULL, " +
-                "timeTaken  INT                  NOT NULL);");
+        bestTimesDB = BestTimesDatabase.GetInstance(this);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             this.pageSize = 5;
         }
-
-        readInMockData();
 
         // Add the hold listener to the "clear times" button to add mock data
         Button clearTimesButton = (Button) findViewById(R.id.clearTimesButton);
 
         clearTimesButton.setOnLongClickListener(new Button.OnLongClickListener() {
             public boolean onLongClick(View v) {
-                addMockData();
+                bestTimesDB.AddMockData();
+                displayNewTimes();
                 return true;
             }
         });
 
         if (name != "" && timeTaken != -1) {
-            this.bestTimesDB.execSQL(String.format("INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d);", name, timeTaken));
-
+            // TODO_REFACTOR_POSS make the score/time accurate down to ms or just make it an int
+            bestTimesDB.InsertTimeEntry(name, (int)timeTaken);
             Toast.makeText(this.getBaseContext(), name+": "+timeTaken+" added to \"Best Times\"", Toast.LENGTH_SHORT).show();
         }
 
@@ -72,44 +65,12 @@ public class BestTimesList extends AppCompatActivity {
 
 
     private void setNumTimeEntries() {
-        Cursor countCr = this.bestTimesDB.rawQuery("SELECT COUNT(*) AS timeCount FROM timeList", null);
-        countCr.moveToFirst();
-
-        this.totalNumTimeEntries = countCr.getInt(countCr.getColumnIndex("timeCount"));
-    }
-
-    private void readInMockData() {
-        Scanner scanner = new Scanner(getResources().openRawResource(R.raw.mock_data));
-
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] parts = line.split("\t");
-
-            if (parts.length == 2) {
-                TimeEntry timeEntry = new TimeEntry();
-                timeEntry.name = parts[0];
-                timeEntry.timeTaken = Integer.parseInt(parts[1]);
-
-                this.mockDataEntries.add(timeEntry);
-            }
-        }
-    }
-
-    private void addMockData() {
-        for (int i = 0; i < mockDataEntries.size(); i++) {
-            this.bestTimesDB.execSQL(String.format(
-                    "INSERT INTO timeList (name, timeTaken) VALUES (\"%s\", %d)",
-                    this.mockDataEntries.get(i).name,
-                    this.mockDataEntries.get(i).timeTaken));
-        }
-
-        setNumTimeEntries();
-        displayNewTimes();
+        this.totalNumTimeEntries = bestTimesDB.GetNumTimeEntries();
     }
 
     // ARCHITECT Should ClearTimesDialogFragment be a class so this is a private?
     public void ClearTimes() {
-        this.bestTimesDB.execSQL("DELETE FROM timeList");
+        bestTimesDB.ClearAllTimes();
 
         this.currentOffset = 0;
         this.totalNumTimeEntries = 0;
@@ -118,18 +79,7 @@ public class BestTimesList extends AppCompatActivity {
     }
 
     private void displayNewTimes() {
-        ArrayList<TimeEntry> timeEntries = new ArrayList<TimeEntry>();
-
-        Cursor cr = this.bestTimesDB.rawQuery("SELECT name, timeTaken FROM timeList ORDER BY timeTaken ASC LIMIT "+currentOffset* pageSize +", "+ pageSize, null);
-        if (cr.moveToFirst()) {
-            do {
-                TimeEntry entry = new TimeEntry();
-                entry.name = cr.getString(cr.getColumnIndex("name"));
-                entry.timeTaken = cr.getInt(cr.getColumnIndex("timeTaken"));
-
-                timeEntries.add(entry);
-            } while (cr.moveToNext());
-        }
+        List<TimeEntry> timeEntries = bestTimesDB.GetData(this.currentOffset, this.pageSize);
 
         ListView bestTimesList = (ListView) findViewById(R.id.bestTimesListView);
 

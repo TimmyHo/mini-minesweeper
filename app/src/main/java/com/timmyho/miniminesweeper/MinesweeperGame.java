@@ -18,9 +18,12 @@ import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.model.BestTimesDatabase;
 import com.timmyho.miniminesweeper.model.MineGrid;
+import com.timmyho.miniminesweeper.model.TimeEntry;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.MineCellAsImageAdapter;
 import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
+
+import java.util.List;
 
 public class MinesweeperGame extends AppCompatActivity {
     private MineGrid myGrid;
@@ -44,7 +47,7 @@ public class MinesweeperGame extends AppCompatActivity {
         initializeMinesweeperUI();
         updateMinesweeperGrid();
 
-        addTimeList();
+        updateTimeList();
 
         // This seems a bit weird, because I am keeping two background tasks, one for the game logic
         // (in MineGrid.java) and then another one here (to update the UI). It makes the structure
@@ -54,6 +57,7 @@ public class MinesweeperGame extends AppCompatActivity {
 
             @Override
             public void run() {
+
                 long timeDisplayed = Math.min(myGrid.GetTimeTaken(), maxTime);
 
                 TextView timerText = (TextView) findViewById(R.id.timerText);
@@ -77,6 +81,7 @@ public class MinesweeperGame extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        updateTimeList();
         myGrid.ResumeGame();
     }
 
@@ -148,15 +153,17 @@ public class MinesweeperGame extends AppCompatActivity {
     }
 
     // REFACTOR Maybe put this in a fragment?
-    private void addTimeList() {
+    private void updateTimeList() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             ListView miniBestTimesList = (ListView) findViewById(R.id.miniBestTimesList);
 
             int currentOffset = 0;
             int pageSize = 5;
 
+            List<TimeEntry> timeEntries = BestTimesDatabase.GetInstance(this).GetData(currentOffset, pageSize);
+
             TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
-                    this, BestTimesDatabase.GetInstance(this).GetData(currentOffset, pageSize), currentOffset, pageSize);
+                    this, timeEntries, currentOffset, pageSize);
 
             miniBestTimesList.setAdapter(timeEntryAdapter);
         }

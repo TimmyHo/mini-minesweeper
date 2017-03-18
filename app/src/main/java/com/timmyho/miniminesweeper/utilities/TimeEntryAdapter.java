@@ -68,8 +68,6 @@ public class TimeEntryAdapter extends BaseAdapter {
                 medalPlaceImage.setImageResource(medalImages.get(position));
             }
 
-            Log.d("position", "position is: "+position+ ": "+this.entries.get(position).name+", "+this.entries.get(position).timeTaken.toString());
-
             TextView nameForTimeEntry = (TextView) v.findViewById(R.id.nameForTimeEntry);
             nameForTimeEntry.setText(this.entries.get(position).name);
 

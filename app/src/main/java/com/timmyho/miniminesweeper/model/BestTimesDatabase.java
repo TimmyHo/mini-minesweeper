@@ -40,6 +40,8 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
 
     BestTimesDatabase(Context appContext) {
         super(appContext, DATABASE_NAME, null, DATABASE_VERSION);
+
+        readInMockData(appContext);
     }
 
     @Override
@@ -50,6 +52,7 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
                 "timeTaken  INT                  NOT NULL);",
                 TABLE_NAME));
         setNumTimeEntries(db);
+
     }
 
     @Override
@@ -98,8 +101,10 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
         setNumTimeEntries(db);
     }
 
-    private void readInMockData() {
-        Scanner scanner = new Scanner(Resources.getSystem().openRawResource(R.raw.mock_data));
+    private void readInMockData(Context applicationContext) {
+        Scanner scanner = new Scanner(applicationContext.getResources().openRawResource(R.raw.mock_data));
+
+        mockDataEntries = new ArrayList<TimeEntry>();
 
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
