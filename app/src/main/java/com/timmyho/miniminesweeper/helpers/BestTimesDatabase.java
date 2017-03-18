@@ -1,15 +1,12 @@
-package com.timmyho.miniminesweeper.model;
+package com.timmyho.miniminesweeper.helpers;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQuery;
-import android.support.v7.app.AppCompatActivity;
 
 import com.timmyho.miniminesweeper.R;
+import com.timmyho.miniminesweeper.model.TimeEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +20,13 @@ import java.util.Scanner;
 public class BestTimesDatabase extends SQLiteOpenHelper {
     // This is def not the right way to do this
     private static BestTimesDatabase instance;
-    private static int numTimeEntries;
-
-    private static List<TimeEntry> mockDataEntries;
 
     private static String DATABASE_NAME = "BestTimesDB";
     private static int DATABASE_VERSION = 1;
     private static String TABLE_NAME = "timeList";
+
+    private int numTimeEntries;
+    private List<TimeEntry> mockDataEntries;
 
     public static BestTimesDatabase GetInstance(Context c) {
         if (instance == null) {
@@ -51,14 +48,63 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
                 "name   VARCHAR(20)              NOT NULL, " +
                 "timeTaken  INT                  NOT NULL);",
                 TABLE_NAME));
-        setNumTimeEntries(db);
 
+        setNumTimeEntries(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         // Do nothing, don't anticipate revving the version and would probably just delete data of
         // the older version
+    }
+
+    private void readInMockData(Context applicationContext) {
+        Scanner scanner = new Scanner(applicationContext.getResources().openRawResource(R.raw.mock_data));
+
+        this.mockDataEntries = new ArrayList<TimeEntry>();
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] parts = line.split("\t");
+
+            if (parts.length == 2) {
+                TimeEntry timeEntry = new TimeEntry();
+                timeEntry.name = parts[0];
+                timeEntry.timeTaken = Integer.parseInt(parts[1]);
+
+                this.mockDataEntries.add(timeEntry);
+            }
+        }
+    }
+
+    public void AddMockData() {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (this.mockDataEntries != null) {
+            for (int i = 0; i < this.mockDataEntries.size(); i++) {
+                db.execSQL(String.format(
+                        "INSERT INTO %s (name, timeTaken) VALUES (\"%s\", %d)",
+                        TABLE_NAME,
+                        this.mockDataEntries.get(i).name,
+                        this.mockDataEntries.get(i).timeTaken));
+            }
+        }
+
+        setNumTimeEntries(db);
+    }
+
+    private void setNumTimeEntries(SQLiteDatabase db) {
+        Cursor countCr = db.rawQuery(String.format("SELECT COUNT(*) AS timeCount FROM %s", TABLE_NAME), null);
+
+        if (countCr.moveToFirst()) {
+            this.numTimeEntries = countCr.getInt(countCr.getColumnIndex("timeCount"));
+        } else {
+            this.numTimeEntries = 0;
+        }
+    }
+
+    public int GetNumTimeEntries() {
+        return this.numTimeEntries;
     }
 
     public List<TimeEntry> GetData(int currentOffset, int pageSize) {
@@ -99,52 +145,5 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
         db.execSQL(String.format("DELETE FROM %s", TABLE_NAME));
 
         setNumTimeEntries(db);
-    }
-
-    private void readInMockData(Context applicationContext) {
-        Scanner scanner = new Scanner(applicationContext.getResources().openRawResource(R.raw.mock_data));
-
-        mockDataEntries = new ArrayList<TimeEntry>();
-
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] parts = line.split("\t");
-
-            if (parts.length == 2) {
-                TimeEntry timeEntry = new TimeEntry();
-                timeEntry.name = parts[0];
-                timeEntry.timeTaken = Integer.parseInt(parts[1]);
-
-                mockDataEntries.add(timeEntry);
-            }
-        }
-    }
-
-    public void AddMockData() {
-        SQLiteDatabase db = getWritableDatabase();
-
-        for (int i = 0; i < mockDataEntries.size(); i++) {
-            db.execSQL(String.format(
-                    "INSERT INTO %s (name, timeTaken) VALUES (\"%s\", %d)",
-                    TABLE_NAME,
-                    mockDataEntries.get(i).name,
-                    mockDataEntries.get(i).timeTaken));
-        }
-
-        setNumTimeEntries(db);
-    }
-
-    private void setNumTimeEntries(SQLiteDatabase db) {
-        Cursor countCr = db.rawQuery(String.format("SELECT COUNT(*) AS timeCount FROM %s", TABLE_NAME), null);
-
-        if (countCr.moveToFirst()) {
-            numTimeEntries = countCr.getInt(countCr.getColumnIndex("timeCount"));
-        } else {
-            numTimeEntries = 0;
-        }
-    }
-
-    public int GetNumTimeEntries() {
-        return numTimeEntries;
     }
 }

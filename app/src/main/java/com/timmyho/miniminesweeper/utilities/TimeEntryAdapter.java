@@ -61,6 +61,7 @@ public class TimeEntryAdapter extends BaseAdapter {
         View v = inflater.inflate(R.layout.time_entry_item, null);
 
         if (position < this.entries.size()) {
+            // Add a medal for the top 3 times
             if (this.currentOffset*this.pageSize + position < medalImages.size()) {
                 ImageView medalPlaceImage = (ImageView) v.findViewById(R.id.medalPlaceImage);
 

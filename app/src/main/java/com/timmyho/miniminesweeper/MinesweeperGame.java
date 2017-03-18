@@ -16,7 +16,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.timmyho.miniminesweeper.model.BestTimesDatabase;
+import com.timmyho.miniminesweeper.helpers.BestTimesDatabase;
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.model.TimeEntry;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;

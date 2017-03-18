@@ -81,9 +81,7 @@
         <ListView
             android:id="@+id/miniBestTimesList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </ListView>
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
             android:layout_width="match_parent"
