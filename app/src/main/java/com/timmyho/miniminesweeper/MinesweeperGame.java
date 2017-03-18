@@ -2,6 +2,7 @@ package com.timmyho.miniminesweeper;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Handler;
@@ -12,11 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.timmyho.miniminesweeper.model.BestTimesDatabase;
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.MineCellAsImageAdapter;
+import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
 
 public class MinesweeperGame extends AppCompatActivity {
     private MineGrid myGrid;
@@ -39,6 +43,8 @@ public class MinesweeperGame extends AppCompatActivity {
 
         initializeMinesweeperUI();
         updateMinesweeperGrid();
+
+        addTimeList();
 
         // This seems a bit weird, because I am keeping two background tasks, one for the game logic
         // (in MineGrid.java) and then another one here (to update the UI). It makes the structure
@@ -139,6 +145,21 @@ public class MinesweeperGame extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    // REFACTOR Maybe put this in a fragment?
+    private void addTimeList() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ListView miniBestTimesList = (ListView) findViewById(R.id.miniBestTimesList);
+
+            int currentOffset = 0;
+            int pageSize = 5;
+
+            TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
+                    this, BestTimesDatabase.GetInstance(this).GetData(currentOffset, pageSize), currentOffset, pageSize);
+
+            miniBestTimesList.setAdapter(timeEntryAdapter);
+        }
     }
 
     private void updateMinesweeperGrid() {

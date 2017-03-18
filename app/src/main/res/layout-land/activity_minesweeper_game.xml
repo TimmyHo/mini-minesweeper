@@ -79,8 +79,8 @@
         </LinearLayout>
 
         <ListView
-            android:id="@+id/miniBestTimes"
-            android:layout_width="wrap_content"
+            android:id="@+id/miniBestTimesList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
         </ListView>
