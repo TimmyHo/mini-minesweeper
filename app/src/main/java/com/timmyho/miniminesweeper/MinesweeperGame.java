@@ -9,9 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.model.MineGrid;
@@ -74,7 +74,7 @@ public class MinesweeperGame extends AppCompatActivity {
         myGrid.ResumeGame();
     }
 
-    private void initializeMinesweeperUI() {
+    private int shortestDim() {
         int statusBarHeight = 0;
         int titleBarHeight = 0;
 
@@ -88,24 +88,32 @@ public class MinesweeperGame extends AppCompatActivity {
             titleBarHeight = getResources().getDimensionPixelSize(titleBarResourceId);
         }
 
-        Log.d("heights", "Status Bar Height: "+statusBarHeight+", Title Bar Height: "+titleBarHeight);
-
-        // Update the UI
+        // PRETTIFY for some reason the height is off by a few pixels.
+        // Investigate at a later time
         int height = Resources.getSystem().getDisplayMetrics().heightPixels - statusBarHeight - titleBarHeight;
-
         int width = Resources.getSystem().getDisplayMetrics().widthPixels;
 
         Log.d("heights", "w, h => "+width+", "+height);
         int shortestDim = Math.min(height, width);
 
-        this.colWidth = shortestDim/numCols;
+        return shortestDim;
+    }
+
+    private void initializeMinesweeperUI() {
+        int shortestLen = shortestDim();
+        this.colWidth = shortestLen/this.numCols;
 
         GridView minesweeperUI = (GridView) findViewById(R.id.minesweeperUI);
 
         minesweeperUI.setNumColumns(this.numCols);
-        minesweeperUI.setStretchMode(GridView.NO_STRETCH);
-//        minesweeperUI.setColumnWidth(minesweeperUI.getWidth()/minesweeperUI.getNumColumns());
-        minesweeperUI.setColumnWidth(colWidth);
+        minesweeperUI.setColumnWidth(this.colWidth);
+
+        // In landscape the width takes all the screen width and pushes the other content off-screen
+        // So need to manually set the width
+        ViewGroup.LayoutParams params = minesweeperUI.getLayoutParams();
+
+        params.width = shortestLen;
+        minesweeperUI.setLayoutParams(params);
 
         minesweeperUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
