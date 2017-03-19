@@ -75,6 +75,7 @@ public class MinesweeperGame extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         outState.putLong("timeTaken", myGrid.GetTimeTaken());
+        outState.putSerializable("gameState", myGrid.GetGameState());
     }
 
     @Override
@@ -82,8 +83,10 @@ public class MinesweeperGame extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
 
         long timeTaken = savedInstanceState.getLong("timeTaken");
+        MineGrid.GameState gameState = (MineGrid.GameState) savedInstanceState.getSerializable("gameState");
 
-        myGrid.RestoreMineGrid(timeTaken);
+        myGrid.RestoreMineGrid(timeTaken, gameState);
+        updateMinesweeperGrid();
     }
 
     @Override
