@@ -16,7 +16,6 @@ import java.util.Scanner;
  * Created by timot on 3/18/2017.
  */
 
-// Maybe there is an easier to figure get the mock data from the resource ID
 public class BestTimesDatabase extends SQLiteOpenHelper {
     // This is def not the right way to do this
     private static BestTimesDatabase instance;

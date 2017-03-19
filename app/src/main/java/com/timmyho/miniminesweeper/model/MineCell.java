@@ -8,24 +8,20 @@ import android.os.Parcelable;
  */
 
 public class MineCell implements Parcelable {
-    Boolean isMine;
-    Integer numSurroundingMines;
-    CellState cellState;
+    private boolean isMine;
+    private int numSurroundingMines;
+    private CellState cellState;
 
     enum CellState { UNCLICKED, CLICKED, CLICKED_LOST, FLAGGED, FLAGGED_WRONG }
 
-    public MineCell(Boolean isMine) {
+    public MineCell(boolean isMine) {
         this.isMine = isMine;
         this.numSurroundingMines = -1;
         this.cellState = CellState.UNCLICKED;
     }
 
-    public MineCell(Parcel in) {
-        this.isMine = (in.readInt() == 1) ? true : false;
-        this.numSurroundingMines = in.readInt();
-        this.cellState = (CellState) in.readSerializable();
-    }
-
+    // Parcelable implementation so it can be successfully saved and restored on orientation change
+    // Used in MinesweeperGame.OnSaveInstanceState and OnRestoreInstanceState
 
     @Override
     public int describeContents() {
@@ -41,14 +37,22 @@ public class MineCell implements Parcelable {
 
     public static final Parcelable.Creator<MineCell> CREATOR
             = new Parcelable.Creator<MineCell>() {
-        public MineCell createFromParcel(Parcel in) {
-            return new MineCell(in);
-        }
+                public MineCell createFromParcel(Parcel in) {
+                    return new MineCell(in);
+                }
 
-        public MineCell[] newArray(int size) {
-            return new MineCell[size];
-        }
-    };
+                public MineCell[] newArray(int size) {
+                    return new MineCell[size];
+                }
+            };
+
+    public MineCell(Parcel in) {
+        this.isMine = (in.readInt() == 1) ? true : false;
+        this.numSurroundingMines = in.readInt();
+        this.cellState = (CellState) in.readSerializable();
+    }
+
+    // End of Parcelable implementation
 
     public Boolean getIsMine() {
         return this.isMine;

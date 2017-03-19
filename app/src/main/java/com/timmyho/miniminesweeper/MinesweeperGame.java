@@ -73,29 +73,29 @@ public class MinesweeperGame extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
 
-        outState.putParcelableArrayList("mineCells", myGrid.GetFlattenedCellList());
+        bundle.putParcelableArrayList("mineCells", myGrid.GetFlattenedCellList());
 
-        outState.putInt("numExposedCells", myGrid.GetNumExposedCells());
-        outState.putInt("numFlaggedCells", myGrid.GetNumFlaggedCells());
-        outState.putLong("timeTaken", myGrid.GetTimeTaken());
+        bundle.putInt("numExposedCells", myGrid.GetNumExposedCells());
+        bundle.putInt("numFlaggedCells", myGrid.GetNumFlaggedCells());
+        bundle.putLong("timeTaken", myGrid.GetTimeTaken());
 
-        outState.putSerializable("gameState", myGrid.GetGameState());
+        bundle.putSerializable("gameState", myGrid.GetGameState());
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    protected void onRestoreInstanceState(Bundle bundle) {
+        super.onRestoreInstanceState(bundle);
 
-        ArrayList<MineCell> mineCells = savedInstanceState.getParcelableArrayList("mineCells");
+        ArrayList<MineCell> mineCells = bundle.getParcelableArrayList("mineCells");
 
-        int numExposedCells = savedInstanceState.getInt("numExposedCells");
-        int numFlaggedCells = savedInstanceState.getInt("numFlaggedCells");
-        long timeTaken = savedInstanceState.getLong("timeTaken");
+        int numExposedCells = bundle.getInt("numExposedCells");
+        int numFlaggedCells = bundle.getInt("numFlaggedCells");
+        long timeTaken = bundle.getLong("timeTaken");
 
-        MineGrid.GameState gameState = (MineGrid.GameState) savedInstanceState.getSerializable("gameState");
+        MineGrid.GameState gameState = (MineGrid.GameState) bundle.getSerializable("gameState");
 
         myGrid.RestoreMineGrid(mineCells, numExposedCells, numFlaggedCells, timeTaken, gameState);
         updateMinesweeperGrid();

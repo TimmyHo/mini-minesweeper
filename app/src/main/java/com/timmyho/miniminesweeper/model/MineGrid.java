@@ -19,6 +19,8 @@ public class MineGrid {
     private int numCols;
     private int numMines;
 
+    // Not currently used, originally for the saving/restoring but went with saving the entire grid
+    // of mine cells instead of saving the seed and regenerating the grid.
     private int randomSeed;
 
     private int exposedCells;
@@ -86,9 +88,15 @@ public class MineGrid {
         this.gameState = GameState.NEW_GAME;
     }
 
-    public void RestoreMineGrid(ArrayList<MineCell> mineCells, int exposedCells, int flaggedCells, long timeTaken, GameState gameState) {
+    public void RestoreMineGrid(
+            ArrayList<MineCell> mineCells,
+            int exposedCells,
+            int flaggedCells,
+            long timeTaken,
+            GameState gameState) {
 
-        // PROTO_ONLY
+        // Another option was to store the seed of the random generator and save the CellState of
+        // each MineCell, but this is a lot simpler (though it takes up more space to save the grid)
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
 
         for (int i = 0; i < this.numRows; i++) {
@@ -100,14 +108,11 @@ public class MineGrid {
         }
 
         // Note: variables such as numRows, numCols, and numMines are constant. If difficulty was
-        // to be introduced that allowed these variables to be changed, have to think abous saving
+        // to be introduced that allowed these variables to be changed, have to think about saving
         // and restoring state
 
-
-        // END OF PROTO_ONLY
         this.exposedCells = exposedCells;
         this.flaggedCells = flaggedCells;
-
         this.timeTaken = timeTaken;
 
         this.gameState = gameState;
