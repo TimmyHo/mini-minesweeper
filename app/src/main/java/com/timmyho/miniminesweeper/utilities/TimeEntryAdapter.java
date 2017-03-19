@@ -23,6 +23,8 @@ import java.util.List;
  */
 
 public class TimeEntryAdapter extends BaseAdapter {
+    public static int TimeEntryItemHeightInDP = 44;
+
     private Context mContext;
     private List<TimeEntry> entries;
     private int currentOffset;

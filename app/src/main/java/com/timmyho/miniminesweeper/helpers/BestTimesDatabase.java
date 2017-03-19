@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.timmyho.miniminesweeper.R;
 import com.timmyho.miniminesweeper.model.TimeEntry;
@@ -24,7 +25,7 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
     private static int DATABASE_VERSION = 1;
     private static String TABLE_NAME = "timeList";
 
-    private int numTimeEntries;
+    private int numTimeEntries = -1;
     private List<TimeEntry> mockDataEntries;
 
     public static BestTimesDatabase GetInstance(Context c) {
@@ -48,8 +49,17 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
                 "timeTaken  INT                  NOT NULL);",
                 TABLE_NAME));
 
+
+        Log.d("huh", "I should be called, no?");
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        Log.d("early", "THIS SHOULD BE CALLED SUPER EARLY");
         setNumTimeEntries(db);
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
@@ -103,6 +113,10 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
     }
 
     public int GetNumTimeEntries() {
+        if (this.numTimeEntries == -1) {
+            SQLiteDatabase db = getReadableDatabase();
+            setNumTimeEntries(db);
+        }
         return this.numTimeEntries;
     }
 

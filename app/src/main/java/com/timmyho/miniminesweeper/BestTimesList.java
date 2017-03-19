@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,7 +37,34 @@ public class BestTimesList extends AppCompatActivity {
         bestTimesDB = BestTimesDatabase.GetInstance(this);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            this.pageSize = 5;
+            // This is pretty ugly because have to check the listview height compared to the item
+            // height and know how many items to show
+            // It is also repeated for the (in all honesty this should be a fragment).
+
+            View bestTimesLayout = findViewById(R.id.bestTimesLayout);
+            bestTimesLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                // Note this is slightly different compared to miniTimesList because it also
+                // includes paging (maybe could bake that into a fragment)
+                @Override
+                public void onLayoutChange(
+                    View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+
+                    view.removeOnLayoutChangeListener(this);
+
+                    ListView bestTimesListView = (ListView) view;
+
+                    int listHeight = bestTimesListView.getHeight();
+                    int divHeight = bestTimesListView.getDividerHeight();
+                    int itemHeight =
+                        (int) (TimeEntryAdapter.TimeEntryItemHeightInDP *
+                        getResources().getDisplayMetrics().density);
+
+                    pageSize = (listHeight + divHeight) / (itemHeight + divHeight);
+
+                    setNumTimeEntries();
+                    displayNewTimes();
+                }
+            });
         }
 
         // Add the hold listener to the "clear times" button to add mock data
@@ -58,7 +87,6 @@ public class BestTimesList extends AppCompatActivity {
         setNumTimeEntries();
         displayNewTimes();
     }
-
 
     private void setNumTimeEntries() {
         this.totalNumTimeEntries = bestTimesDB.GetNumTimeEntries();
@@ -93,6 +121,9 @@ public class BestTimesList extends AppCompatActivity {
 
         Button nextTimesButton = (Button) findViewById(R.id.nextTimesButton);
         nextTimesButton.setEnabled((this.currentOffset + 1) * this.pageSize <= this.totalNumTimeEntries);
+
+        Log.d("values", String.format("co, ps, tnte => %d, %d, %d",
+            this.currentOffset, this.pageSize, this.totalNumTimeEntries));
     }
 
     public void PrevTimesClick(View view) {

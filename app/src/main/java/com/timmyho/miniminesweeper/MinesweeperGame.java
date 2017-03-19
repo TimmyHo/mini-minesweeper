@@ -192,17 +192,36 @@ public class MinesweeperGame extends AppCompatActivity {
     // REFACTOR Maybe put this in a fragment?
     private void updateTimeList() {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ListView miniBestTimesList = (ListView) findViewById(R.id.miniBestTimesList);
+            // This is pretty ugly because have to check the listview height compared to the item
+            // height and know how many items to show
+            // It is also repeated for the (in all honesty this should be a fragment).
 
-            int currentOffset = 0;
-            int pageSize = 5;
+            View minesweeperGameLayout = findViewById(R.id.minesweeperGameLayout);
+            minesweeperGameLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                    view.removeOnLayoutChangeListener(this);
 
-            List<TimeEntry> timeEntries = BestTimesDatabase.GetInstance(this).GetData(currentOffset, pageSize);
+                    ListView miniBestTimesList = (ListView) findViewById(R.id.miniBestTimesList);
+                    int listHeight = miniBestTimesList.getHeight();
+                    int divHeight = miniBestTimesList.getDividerHeight();
+                    int itemHeight =
+                        (int) (TimeEntryAdapter.TimeEntryItemHeightInDP *
+                        getResources().getDisplayMetrics().density);
 
-            TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
-                    this, timeEntries, currentOffset, pageSize);
+                    int currentOffset = 0;
+                    // It's okay to not have the divider show up at the bottom of the list so one
+                    // divider height is added
+                    int pageSize = (listHeight + divHeight) / (itemHeight + divHeight);
 
-            miniBestTimesList.setAdapter(timeEntryAdapter);
+                    List<TimeEntry> timeEntries = BestTimesDatabase.GetInstance(getBaseContext()).GetData(currentOffset, pageSize);
+
+                    TimeEntryAdapter timeEntryAdapter = new TimeEntryAdapter(
+                            getBaseContext(), timeEntries, currentOffset, pageSize);
+
+                    miniBestTimesList.setAdapter(timeEntryAdapter);
+                }
+            });
         }
     }
 
