@@ -74,6 +74,7 @@ public class MinesweeperGame extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        outState.putInt("randomSeed", myGrid.GetRandomSeed());
         outState.putLong("timeTaken", myGrid.GetTimeTaken());
         outState.putSerializable("gameState", myGrid.GetGameState());
     }
@@ -82,10 +83,11 @@ public class MinesweeperGame extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
+        int randomSeed = savedInstanceState.getInt("randomSeed");
         long timeTaken = savedInstanceState.getLong("timeTaken");
         MineGrid.GameState gameState = (MineGrid.GameState) savedInstanceState.getSerializable("gameState");
 
-        myGrid.RestoreMineGrid(timeTaken, gameState);
+        myGrid.RestoreMineGrid(randomSeed, timeTaken, gameState);
         updateMinesweeperGrid();
     }
 

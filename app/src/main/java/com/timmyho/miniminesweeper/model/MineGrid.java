@@ -19,6 +19,8 @@ public class MineGrid {
     private int numCols;
     private int numMines;
 
+    private int randomSeed;
+
     private int exposedCells;
     private int flaggedCells;
 
@@ -71,7 +73,10 @@ public class MineGrid {
             this.mineGrid.add(mineRow);
         }
 
-        this.placeMines();
+        Random rand = new Random();
+        int seed = rand.nextInt();
+
+        this.placeMines(seed);
 
         this.calculateSurroundingMines();
         this.exposedCells = 0;
@@ -81,7 +86,7 @@ public class MineGrid {
         this.gameState = GameState.NEW_GAME;
     }
 
-    public void RestoreMineGrid(long timeTaken, GameState gameState) {
+    public void RestoreMineGrid(int seed, long timeTaken, GameState gameState) {
 
         // PROTO_ONLY
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
@@ -96,7 +101,7 @@ public class MineGrid {
             this.mineGrid.add(mineRow);
         }
 
-        this.placeMines();
+        this.placeMines(seed);
 
         this.calculateSurroundingMines();
         this.exposedCells = 0;
@@ -108,16 +113,20 @@ public class MineGrid {
         this.gameState = gameState;
     }
 
-    public GameState GetGameState() {
-        return this.gameState;
-    }
+    public int GetRandomSeed() { return this.randomSeed; }
 
     public int GetNumFlaggedCells() { return this.flaggedCells; }
 
     public long GetTimeTaken() { return this.timeTaken; }
 
-    private void placeMines() {
-        Random rand = new Random();
+    public GameState GetGameState() {
+        return this.gameState;
+    }
+
+
+    private void placeMines(int seed) {
+        Random rand = new Random(seed);
+        this.randomSeed = seed;
 
         // OPT? The other option (to have it = numMines) is to generate an array of all possible
         // values and then take a random number, add a mine at that index and remove it from the
