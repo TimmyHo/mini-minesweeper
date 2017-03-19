@@ -71,6 +71,22 @@ public class MinesweeperGame extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("timeTaken", myGrid.GetTimeTaken());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        long timeTaken = savedInstanceState.getLong("timeTaken");
+
+        myGrid.RestoreMineGrid(timeTaken);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 

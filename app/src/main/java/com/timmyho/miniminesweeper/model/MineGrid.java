@@ -80,6 +80,33 @@ public class MineGrid {
         this.timeTaken = 0;
     }
 
+    public void RestoreMineGrid(long timeTaken) {
+
+        // PROTO_ONLY
+        this.mineGrid = new ArrayList<ArrayList<MineCell>>();
+
+        int numRandomMines = 0;
+        for (int i = 0; i < this.numRows; i++) {
+            ArrayList<MineCell> mineRow = new ArrayList<MineCell>();
+            for (int j = 0; j < this.numCols; j++) {
+                MineCell cell = new MineCell(false);
+                mineRow.add(cell);
+            }
+            this.mineGrid.add(mineRow);
+        }
+
+        this.placeMines();
+
+        this.calculateSurroundingMines();
+        this.gameState = GameState.NEW_GAME;
+        this.exposedCells = 0;
+        this.flaggedCells = 0;
+
+        // END OF PROTO_ONLY
+
+        this.timeTaken = timeTaken;
+    }
+
     public GameState GetGameState() {
         return this.gameState;
     }
