@@ -216,7 +216,9 @@ public class MinesweeperGame extends AppCompatActivity {
 
         // Update ancillary (ie: non-game) elements
         TextView numMinesText = (TextView) findViewById(R.id.numMinesText);
-        numMinesText.setText(String.valueOf(this.numMines - myGrid.GetNumFlaggedCells()));
+
+        Integer remainingMines = this.numMines - myGrid.GetNumFlaggedCells();
+        numMinesText.setText(String.format("%02d", remainingMines));
 
         MineGrid.GameState gameState = myGrid.GetGameState();
 
