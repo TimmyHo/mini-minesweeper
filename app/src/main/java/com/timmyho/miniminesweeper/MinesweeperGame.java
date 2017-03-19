@@ -17,12 +17,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.timmyho.miniminesweeper.helpers.BestTimesDatabase;
+import com.timmyho.miniminesweeper.model.MineCell;
 import com.timmyho.miniminesweeper.model.MineGrid;
 import com.timmyho.miniminesweeper.model.TimeEntry;
 import com.timmyho.miniminesweeper.utilities.BestTimeEntryDialogFragment;
 import com.timmyho.miniminesweeper.utilities.MineCellAsImageAdapter;
 import com.timmyho.miniminesweeper.utilities.TimeEntryAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MinesweeperGame extends AppCompatActivity {
@@ -74,8 +76,12 @@ public class MinesweeperGame extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("randomSeed", myGrid.GetRandomSeed());
+        outState.putParcelableArrayList("mineCells", myGrid.GetFlattenedCellList());
+
+        outState.putInt("numExposedCells", myGrid.GetNumExposedCells());
+        outState.putInt("numFlaggedCells", myGrid.GetNumFlaggedCells());
         outState.putLong("timeTaken", myGrid.GetTimeTaken());
+
         outState.putSerializable("gameState", myGrid.GetGameState());
     }
 
@@ -83,11 +89,15 @@ public class MinesweeperGame extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        int randomSeed = savedInstanceState.getInt("randomSeed");
+        ArrayList<MineCell> mineCells = savedInstanceState.getParcelableArrayList("mineCells");
+
+        int numExposedCells = savedInstanceState.getInt("numExposedCells");
+        int numFlaggedCells = savedInstanceState.getInt("numFlaggedCells");
         long timeTaken = savedInstanceState.getLong("timeTaken");
+
         MineGrid.GameState gameState = (MineGrid.GameState) savedInstanceState.getSerializable("gameState");
 
-        myGrid.RestoreMineGrid(randomSeed, timeTaken, gameState);
+        myGrid.RestoreMineGrid(mineCells, numExposedCells, numFlaggedCells, timeTaken, gameState);
         updateMinesweeperGrid();
     }
 

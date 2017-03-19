@@ -24,9 +24,13 @@ import java.util.List;
 
 public class TimeEntryAdapter extends BaseAdapter {
     private Context mContext;
-    List<TimeEntry> entries;
-    int currentOffset;
-    int pageSize;
+    private List<TimeEntry> entries;
+    private int currentOffset;
+    private int pageSize;
+
+
+    private List<Integer> medalImages = Arrays.asList(R.drawable.medal_1st, R.drawable.medal_2nd, R.drawable.medal_3rd);
+
 
     public TimeEntryAdapter(Context c, List<TimeEntry> entries,  int currentOffset, int pageSize) {
         mContext = c;
@@ -52,9 +56,6 @@ public class TimeEntryAdapter extends BaseAdapter {
         return (int) (Math.ceil(this.entries.size() / (double)pageSize)*pageSize);
 
     }
-
-    private List<Integer> medalImages = Arrays.asList(R.drawable.medal_1st, R.drawable.medal_2nd, R.drawable.medal_3rd);
-
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

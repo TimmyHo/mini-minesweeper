@@ -86,34 +86,36 @@ public class MineGrid {
         this.gameState = GameState.NEW_GAME;
     }
 
-    public void RestoreMineGrid(int seed, long timeTaken, GameState gameState) {
+    public void RestoreMineGrid(ArrayList<MineCell> mineCells, int exposedCells, int flaggedCells, long timeTaken, GameState gameState) {
 
         // PROTO_ONLY
         this.mineGrid = new ArrayList<ArrayList<MineCell>>();
 
-        int numRandomMines = 0;
         for (int i = 0; i < this.numRows; i++) {
             ArrayList<MineCell> mineRow = new ArrayList<MineCell>();
             for (int j = 0; j < this.numCols; j++) {
-                MineCell cell = new MineCell(false);
-                mineRow.add(cell);
+                mineRow.add(mineCells.get(i * this.numCols + j));
             }
             this.mineGrid.add(mineRow);
         }
 
-        this.placeMines(seed);
+        // Note: variables such as numRows, numCols, and numMines are constant. If difficulty was
+        // to be introduced that allowed these variables to be changed, have to think abous saving
+        // and restoring state
 
-        this.calculateSurroundingMines();
-        this.exposedCells = 0;
-        this.flaggedCells = 0;
 
         // END OF PROTO_ONLY
+        this.exposedCells = exposedCells;
+        this.flaggedCells = flaggedCells;
+
         this.timeTaken = timeTaken;
 
         this.gameState = gameState;
     }
 
     public int GetRandomSeed() { return this.randomSeed; }
+
+    public int GetNumExposedCells() { return  this.exposedCells; }
 
     public int GetNumFlaggedCells() { return this.flaggedCells; }
 
@@ -123,6 +125,13 @@ public class MineGrid {
         return this.gameState;
     }
 
+    public ArrayList<MineCell> GetFlattenedCellList() {
+        ArrayList<MineCell> flattenedList = new ArrayList<MineCell>();
+        for (int i = 0; i < mineGrid.size(); i++) {
+            flattenedList.addAll(mineGrid.get(i));
+        }
+        return flattenedList;
+    }
 
     private void placeMines(int seed) {
         Random rand = new Random(seed);
