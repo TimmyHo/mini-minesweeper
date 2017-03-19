@@ -97,6 +97,12 @@ public class MinesweeperGame extends AppCompatActivity {
 
         MineGrid.GameState gameState = (MineGrid.GameState) bundle.getSerializable("gameState");
 
+        // This occurs because the game first gets paused before it gets closed
+        // However, if the app is restored, the game should continue
+        if (gameState == MineGrid.GameState.PAUSED) {
+            gameState = MineGrid.GameState.STARTED;
+        }
+
         myGrid.RestoreMineGrid(mineCells, numExposedCells, numFlaggedCells, timeTaken, gameState);
         updateMinesweeperGrid();
     }
