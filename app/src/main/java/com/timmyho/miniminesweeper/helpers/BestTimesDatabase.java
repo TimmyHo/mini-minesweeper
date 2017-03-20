@@ -44,18 +44,14 @@ public class BestTimesDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(String.format("CREATE TABLE IF NOT EXISTS %s (" +
-                "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
-                "name   VARCHAR(20)              NOT NULL, " +
-                "timeTaken  INT                  NOT NULL);",
+                        "id     INTEGER    PRIMARY KEY   AUTOINCREMENT, " +
+                        "name   VARCHAR(20)              NOT NULL, " +
+                        "timeTaken  INT                  NOT NULL);",
                 TABLE_NAME));
-
-
-        Log.d("huh", "I should be called, no?");
     }
 
     @Override
     public void onOpen(SQLiteDatabase db) {
-        Log.d("early", "THIS SHOULD BE CALLED SUPER EARLY");
         setNumTimeEntries(db);
     }
 
